@@ -1,9 +1,11 @@
 {
     "compilerOptions": {
-      "outDir": "./build"
+      "outDir": "./build",
+      "module": "ESNext",
+      "strict": true
     },
     "include": [
-      "src/*.ts"
+      "src/**/*.ts"
     ],
     "exclude": [
       "node_modules"

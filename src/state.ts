@@ -1,4 +1,7 @@
+import { GameContext } from './gameContext';
+
 export interface State {
-    handle(context: StateMachine): void;
+    name: string;
+    step(context: GameContext, scene: any, camera: any): void;
 }
   

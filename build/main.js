@@ -1,24 +1,13 @@
 import { GameContext } from './gameContext.js';
 import { InGameState } from './inGameState.js';
-
-function main(argv: {[key: string]: string}) {
+function main(argv) {
     var debugEnabled = argv["debugEnabled"] === "true";
-
-    const initialState = new InGameState("In Game");
-
-    const gameContext = new GameContext(
-        initialState,
-        debugEnabled
-    );
-    
+    var initialState = new InGameState("In Game");
+    var gameContext = new GameContext(initialState, debugEnabled);
     function step() {
         gameContext.step();
         requestAnimationFrame(step);
     }
-
     requestAnimationFrame(step);
 }
-
-main(
-    {"debugEnabled": "true"}
-)
+main({ "debugEnabled": "true" });
