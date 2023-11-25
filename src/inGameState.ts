@@ -6,6 +6,7 @@ import { InputControllerDelegate } from './inputControllerDelegate';
 import { GameInputEvent } from './gameInputEvent';
 import { InputController } from './inputController';
 import { GameInputMouseEvent } from './gameInputMouseEvent.js';
+import { Identifiers } from './identifiers.js';
 
 export class InGameState implements State, InputControllerDelegate {
   
@@ -54,7 +55,7 @@ export class InGameState implements State, InputControllerDelegate {
         this.context?.debugPrint("xDiff:"+xDiff+"; y: " + value[1]);
         this.moveObjectByDiffX("player car", xDiff);
         this.moveObjectByDiffX("camera", xDiff);
-        this.moveObjectByDiffX("background", xDiff);
+        this.moveObjectByDiffX(Identifiers.skyboxFront, xDiff);
       }
   }
 
@@ -64,7 +65,7 @@ export class InGameState implements State, InputControllerDelegate {
     this.context = context;
     this.sceneController = context.sceneController;
 
-    this.sceneController.addBackground();
+    this.sceneController.addSkybox();
 
     this.sceneController.addCarAt(
       "player car",

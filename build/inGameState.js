@@ -1,5 +1,6 @@
 import { SceneController } from './sceneController.js';
 import { GameInputMouseEvent } from './gameInputMouseEvent.js';
+import { Identifiers } from './identifiers.js';
 var InGameState = /** @class */ (function () {
     function InGameState(name, sceneController) {
         this.roadSegmentsColumnsCount = 4;
@@ -23,13 +24,13 @@ var InGameState = /** @class */ (function () {
             (_a = this.context) === null || _a === void 0 ? void 0 : _a.debugPrint("xDiff:" + xDiff + "; y: " + value[1]);
             this.moveObjectByDiffX("player car", xDiff);
             this.moveObjectByDiffX("camera", xDiff);
-            this.moveObjectByDiffX("background", xDiff);
+            this.moveObjectByDiffX(Identifiers.skyboxFront, xDiff);
         }
     };
     InGameState.prototype.initialize = function (context) {
         this.context = context;
         this.sceneController = context.sceneController;
-        this.sceneController.addBackground();
+        this.sceneController.addSkybox();
         this.sceneController.addCarAt("player car", 0, -2, -4);
         for (var x = 0; x < this.roadSegmentsColumnsCount; x++) {
             for (var z = 0; z < this.roadSegmentsRowsCount; z++) {

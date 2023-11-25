@@ -1,6 +1,7 @@
 import { Context } from "./context.js"
 import { Utils } from './utils.js'
 import { SceneObject } from "./sceneObject.js";
+import { Identifiers } from "./identifiers.js";
 
 export class SceneController {
 
@@ -90,9 +91,9 @@ export class SceneController {
         this.scene.add(object.threeObject);
     }
 
-    public addBackground(): void {
+    public addSkybox(): void {
         this.addPlaneAt(
-            "background",
+            Identifiers.skyboxFront,
             0,
             0,
             -0.5,
@@ -102,6 +103,54 @@ export class SceneController {
             0x0000FF,
             true
         )
+
+        this.addPlaneAt(
+            Identifiers.skyboxLeft,
+            0,
+            0,
+            -0.5,
+            1,
+            1,
+            "data/background.png",
+            0x00FFFF,
+            true
+        )
+        this.rotateObject(
+            Identifiers.skyboxLeft,
+            0,
+            Utils.angleToRadians(90),
+            0
+        )   
+        this.moveObjectTo(
+            Identifiers.skyboxLeft,
+            -0.5,
+            0,
+            0
+        )
+
+        this.addPlaneAt(
+            Identifiers.skyboxRight,
+            0,
+            0,
+            0.5,
+            1,
+            1,
+            "data/background.png",
+            0xFF00FF,
+            true
+        )
+        this.rotateObject(
+            Identifiers.skyboxRight,
+            0,
+            Utils.angleToRadians(90),
+            0
+        )   
+        this.moveObjectTo(
+            Identifiers.skyboxRight,
+            0.5,
+            0,
+            0
+        )        
     }
 
     public addBoxAt(

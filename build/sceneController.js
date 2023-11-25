@@ -1,5 +1,6 @@
 import { Utils } from './utils.js';
 import { SceneObject } from "./sceneObject.js";
+import { Identifiers } from "./identifiers.js";
 var SceneController = /** @class */ (function () {
     function SceneController(context, canvas) {
         this.context = context;
@@ -51,8 +52,14 @@ var SceneController = /** @class */ (function () {
         this.objects.push(object);
         this.scene.add(object.threeObject);
     };
-    SceneController.prototype.addBackground = function () {
-        this.addPlaneAt("background", 0, 0, -0.5, 1, 1, "data/background.png", 0x0000FF, true);
+    SceneController.prototype.addSkybox = function () {
+        this.addPlaneAt(Identifiers.skyboxFront, 0, 0, -0.5, 1, 1, "data/background.png", 0x0000FF, true);
+        this.addPlaneAt(Identifiers.skyboxLeft, 0, 0, -0.5, 1, 1, "data/background.png", 0x00FFFF, true);
+        this.rotateObject(Identifiers.skyboxLeft, 0, Utils.angleToRadians(90), 0);
+        this.moveObjectTo(Identifiers.skyboxLeft, -0.5, 0, 0);
+        this.addPlaneAt(Identifiers.skyboxRight, 0, 0, 0.5, 1, 1, "data/background.png", 0xFF00FF, true);
+        this.rotateObject(Identifiers.skyboxRight, 0, Utils.angleToRadians(90), 0);
+        this.moveObjectTo(Identifiers.skyboxRight, 0.5, 0, 0);
     };
     SceneController.prototype.addBoxAt = function (name, x, y, z, color) {
         this.context.debugPrint("addCubeAt");
