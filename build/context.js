@@ -35,6 +35,7 @@ var Context = /** @class */ (function () {
         this.state.initialize(this);
     };
     Context.prototype.step = function () {
+        this.inputController.step();
         this.sceneController.step();
         this.state.step();
     };
@@ -45,7 +46,6 @@ var Context = /** @class */ (function () {
         console.log(text);
     };
     Context.prototype.inputControllerDidReceive = function (inputController, inputEvent) {
-        this.debugPrint("inputControllerDidReceive");
         this.state.inputControllerDidReceive(inputController, inputEvent);
     };
     return Context;

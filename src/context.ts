@@ -64,6 +64,7 @@ export class Context implements InputControllerDelegate {
   }
 
   public step() {
+    this.inputController.step();
     this.sceneController.step();
     this.state.step();
   }
@@ -79,7 +80,6 @@ export class Context implements InputControllerDelegate {
     inputController: InputController,
     inputEvent: GameInputEvent<T>
   ): void {
-    this.debugPrint("inputControllerDidReceive");
     this.state.inputControllerDidReceive(inputController, inputEvent);
   }
 }

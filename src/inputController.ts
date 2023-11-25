@@ -5,6 +5,12 @@ import { GameInputMouseEvent } from "./gameInputMouseEvent.js";
 export class InputController {
 
     private isTouching: boolean = false;
+    private touchStartX: number = 0;
+    private touchStartY: number = 0;
+    private currentTouchX: number = 0;
+    private currentTouchY: number = 0;
+    private diffX: number = 0;
+
     private context: Context;
     private canvas: HTMLCanvasElement;
     private delegate: InputControllerDelegate;
@@ -32,22 +38,24 @@ export class InputController {
     }
 
     private onMouseDown(event: MouseEvent) {
-        this.isTouching = true;
+        this.touchStartX = event.x;
+        this.touchStartY = event.y;
+        this.currentTouchX = this.touchStartX;
+        this.currentTouchY = this.touchStartY;
+        this.isTouching = true;        
         this.context.debugPrint("onMouseDown");
     }
 
     private onMouseUp(event: MouseEvent) {
         this.isTouching = false;
+        this.touchStartX = 0;
+        this.touchStartY = 0;        
         this.context.debugPrint("onMouseUp");
     }    
 
     private onMouseMove(event: MouseEvent) {
-        if (!this.isTouching) {
-            return;
-        }
-        this.context.debugPrint("onMouseMove");
-        const mouseEvent = new GameInputMouseEvent([event.x, event.y]);
-        this.delegate.inputControllerDidReceive(this, mouseEvent);
+        this.currentTouchX = event.x;
+        this.currentTouchY = event.y;
     }      
 
     private onTouchStart(event: TouchEvent) {
@@ -60,5 +68,18 @@ export class InputController {
 
     private onTouchMove(event: TouchEvent) {
         this.context.debugPrint("onTouchMove");
+    }
+
+    public step() {
+        if (this.isTouching) {
+            const xLimit = this.canvas.width;
+            var xAspect = (this.currentTouchX - this.touchStartX) / xLimit;
+            xAspect = Math.min(xLimit, xAspect);
+            this.context.debugPrint("currentTouchX: "+ this.currentTouchX);
+            this.context.debugPrint("touchStartX: " + this.touchStartX);
+            const yAspect = this.currentTouchY / this.canvas.height;
+            const mouseEvent = new GameInputMouseEvent([xAspect, yAspect]);
+            this.delegate.inputControllerDidReceive(this, mouseEvent);            
+        }
     }
 }

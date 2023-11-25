@@ -1,4 +1,5 @@
 import { SceneController } from './sceneController.js';
+import { GameInputMouseEvent } from './gameInputMouseEvent.js';
 var InGameState = /** @class */ (function () {
     function InGameState(name, sceneController) {
         this.roadSegmentsColumnsCount = 4;
@@ -7,15 +8,29 @@ var InGameState = /** @class */ (function () {
         this.name = name;
         this.sceneController = sceneController;
     }
+    InGameState.prototype.moveObjectByDiffX = function (name, diffX) {
+        var position = this.sceneController.sceneObjectPosition(name);
+        position.x += diffX;
+        this.sceneController.moveObjectTo(name, position.x, position.y, position.z);
+    };
+    ;
     InGameState.prototype.inputControllerDidReceive = function (inputController, inputEvent) {
         var _a;
-        (_a = this.context) === null || _a === void 0 ? void 0 : _a.debugPrint("YO!!!!!!");
+        if (inputEvent instanceof GameInputMouseEvent) {
+            var value = inputEvent.value;
+            var inputX = value[0];
+            var xDiff = inputX;
+            (_a = this.context) === null || _a === void 0 ? void 0 : _a.debugPrint("xDiff:" + xDiff + "; y: " + value[1]);
+            this.moveObjectByDiffX("player car", xDiff);
+            this.moveObjectByDiffX("camera", xDiff);
+            this.moveObjectByDiffX("background", xDiff);
+        }
     };
     InGameState.prototype.initialize = function (context) {
         this.context = context;
         this.sceneController = context.sceneController;
         this.sceneController.addBackground();
-        this.sceneController.addCarAt("playerCar", 0, -2, -4);
+        this.sceneController.addCarAt("player car", 0, -2, -4);
         for (var x = 0; x < this.roadSegmentsColumnsCount; x++) {
             for (var z = 0; z < this.roadSegmentsRowsCount; z++) {
                 var name_1 = this.roadSegmentName(x, z);

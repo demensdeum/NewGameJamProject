@@ -5,6 +5,7 @@ import { SceneController } from './sceneController.js';
 import { InputControllerDelegate } from './inputControllerDelegate';
 import { GameInputEvent } from './gameInputEvent';
 import { InputController } from './inputController';
+import { GameInputMouseEvent } from './gameInputMouseEvent.js';
 
 export class InGameState implements State, InputControllerDelegate {
   
@@ -27,10 +28,34 @@ export class InGameState implements State, InputControllerDelegate {
     this.sceneController = sceneController;
   }
 
-  inputControllerDidReceive<T>(
+  private moveObjectByDiffX(
+    name: string,
+    diffX: number
+  ) {
+    const position = this.sceneController.sceneObjectPosition(
+      name
+    );
+    position.x += diffX;
+    this.sceneController.moveObjectTo(
+      name,
+      position.x,
+      position.y,
+      position.z
+    );
+  };
+
+  public inputControllerDidReceive<T>(
     inputController: InputController, 
     inputEvent: GameInputEvent<T>): void {
-    this.context?.debugPrint("YO!!!!!!");
+      if (inputEvent instanceof GameInputMouseEvent) {
+        const value = inputEvent.value;
+        const inputX = value[0];
+        const xDiff = inputX;
+        this.context?.debugPrint("xDiff:"+xDiff+"; y: " + value[1]);
+        this.moveObjectByDiffX("player car", xDiff);
+        this.moveObjectByDiffX("camera", xDiff);
+        this.moveObjectByDiffX("background", xDiff);
+      }
   }
 
   public initialize(
@@ -42,7 +67,7 @@ export class InGameState implements State, InputControllerDelegate {
     this.sceneController.addBackground();
 
     this.sceneController.addCarAt(
-      "playerCar",
+      "player car",
       0, 
       -2, 
       -4
