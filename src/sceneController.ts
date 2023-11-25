@@ -59,6 +59,20 @@ export class SceneController {
         this.scene.add(object);
     }
 
+    public addBackground(): void {
+        this.addPlaneAt(
+            "background",
+            0,
+            0,
+            -0.5,
+            1,
+            1,
+            "data/background.png",
+            0x0000FF,
+            true
+        )
+    }
+
     public addBoxAt(
         name: string,
         x: number,
@@ -86,19 +100,25 @@ export class SceneController {
         y: number,
         z: number,
         width: number,
-        height: number
+        height: number,
+        texturePath: string,
+        color: number = 0xFFFFFF,
+        resetDepthBuffer: boolean = false
     ): void {
         this.context.debugPrint("addPlaneAt");
         // @ts-ignore
         const planeGeometry = new THREE.PlaneGeometry(width, height);
 
-        const texture = this.loadTexture("./data/roadSegmentTexture.png");
+        const texture = this.loadTexture(texturePath);
 
         // @ts-ignore
-        const planeMaterial = new THREE.MeshBasicMaterial({ 
+        const planeMaterial = new THREE.MeshBasicMaterial({
+            // @ts-ignore
+            color: color,
+            depthWrite: !resetDepthBuffer,        
             map: texture,
             // @ts-ignore
-            side: THREE.DoubleSide
+            side: THREE.DoubleSide,
         });
         // @ts-ignore
         const plane = new THREE.Mesh(planeGeometry, planeMaterial);
@@ -138,8 +158,9 @@ export class SceneController {
             y,
             z,
             SceneController.roadSegmentSize,
-            SceneController.roadSegmentSize
-        ) 
+            SceneController.roadSegmentSize,
+            "data/roadSegmentTexture.png"
+        ); 
         this.rotateObject(
             name,
             Utils.angleToRadians(-90),

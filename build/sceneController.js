@@ -35,6 +35,9 @@ var SceneController = /** @class */ (function () {
         this.objects.push(object);
         this.scene.add(object);
     };
+    SceneController.prototype.addBackground = function () {
+        this.addPlaneAt("background", 0, 0, -0.5, 1, 1, "data/background.png", 0x0000FF, true);
+    };
     SceneController.prototype.addBoxAt = function (name, x, y, z, color) {
         this.context.debugPrint("addCubeAt");
         // @ts-ignore
@@ -49,16 +52,21 @@ var SceneController = /** @class */ (function () {
         box.position.z = z;
         this.addObject(box);
     };
-    SceneController.prototype.addPlaneAt = function (name, x, y, z, width, height) {
+    SceneController.prototype.addPlaneAt = function (name, x, y, z, width, height, texturePath, color, resetDepthBuffer) {
+        if (color === void 0) { color = 0xFFFFFF; }
+        if (resetDepthBuffer === void 0) { resetDepthBuffer = false; }
         this.context.debugPrint("addPlaneAt");
         // @ts-ignore
         var planeGeometry = new THREE.PlaneGeometry(width, height);
-        var texture = this.loadTexture("./data/roadSegmentTexture.png");
+        var texture = this.loadTexture(texturePath);
         // @ts-ignore
         var planeMaterial = new THREE.MeshBasicMaterial({
+            // @ts-ignore
+            color: color,
+            depthWrite: !resetDepthBuffer,
             map: texture,
             // @ts-ignore
-            side: THREE.DoubleSide
+            side: THREE.DoubleSide,
         });
         // @ts-ignore
         var plane = new THREE.Mesh(planeGeometry, planeMaterial);
@@ -74,7 +82,7 @@ var SceneController = /** @class */ (function () {
     };
     SceneController.prototype.addRoadSegmentAt = function (name, x, y, z) {
         this.context.debugPrint("addRoadSegmentAt");
-        this.addPlaneAt(name, x, y, z, SceneController.roadSegmentSize, SceneController.roadSegmentSize);
+        this.addPlaneAt(name, x, y, z, SceneController.roadSegmentSize, SceneController.roadSegmentSize, "data/roadSegmentTexture.png");
         this.rotateObject(name, Utils.angleToRadians(-90), 0, 0);
     };
     SceneController.prototype.objectWithName = function (name) {

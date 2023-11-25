@@ -5,33 +5,40 @@ import { SceneController } from './sceneController.js';
 
 export class InGameState implements State {
   
-  public static roadSegmentsXOffset: number = SceneController.roadSegmentSize;
+  private readonly roadSegmentsColumnsCount: number = 4;
+  private readonly roadSegmentsRowsCount: number = 20;
+
+  public static roadSegmentsXOffset: number = -(SceneController.roadSegmentSize + SceneController.roadSegmentSize / 2);
   public name: string;
 
-  constructor(name: string) {
+  private sceneController?: SceneController;
+
+  constructor(
+    name: string
+  ) {
     this.name = name;
   }
 
   public initialize(
     context: Context
   ): void {
-    context.sceneController.addCarAt(
+    this.sceneController = context.sceneController;
+
+    this.sceneController.addBackground();
+
+    this.sceneController.addCarAt(
       "playerCar",
       0, 
       -2, 
       -4
     );
 
-    const columnsCount = 3;
-    const rowsCount = 20;
-
-
-    for (let x = 0; x < columnsCount; x++) {
-      for (let y = 0; y < rowsCount; y++) {
-        const name = "roadSegment-"+x+":"+y;
-        const roadSegmentX = x * SceneController.roadSegmentSize - InGameState.roadSegmentsXOffset;
-        const roadSegmentZ = -y * SceneController.roadSegmentSize;
-        context.sceneController.addRoadSegmentAt(
+    for (let x = 0; x < this.roadSegmentsColumnsCount; x++) {
+      for (let z = 0; z < this.roadSegmentsRowsCount; z++) {
+        const name = "roadSegment-"+x+":"+z;
+        const roadSegmentX = x * SceneController.roadSegmentSize + InGameState.roadSegmentsXOffset;
+        const roadSegmentZ = -z * SceneController.roadSegmentSize;
+        this.sceneController.addRoadSegmentAt(
           name,
           roadSegmentX, 
           -3, 
@@ -39,7 +46,7 @@ export class InGameState implements State {
           );
       }
     }
-    context.sceneController.moveObjectTo(
+    this.sceneController.moveObjectTo(
       "camera", 
       0, 
       0, 
