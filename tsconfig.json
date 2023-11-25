@@ -2,7 +2,8 @@
     "compilerOptions": {
       "outDir": "./build",
       "module": "ESNext",
-      "strict": true
+      "strict": true,
+      "noImplicitReturns": true
     },
     "include": [
       "src/**/*.ts"

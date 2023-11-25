@@ -9,8 +9,9 @@ if %ERRORLEVEL% neq 0 (
     @echo off
     exit %ERRORLEVEL%
 )
+@echo on
 
-start python tools/server.py
-timeout /t 1
-firefox http://localhost:8000
-@pause
+@REM start python tools/server.py
+@REM timeout /t 1
+@REM firefox http://localhost:8000
+@REM @pause

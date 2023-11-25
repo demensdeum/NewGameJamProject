@@ -1,4 +1,4 @@
-import { GameContext } from './gameContext.js';
+import { Context } from './context.js';
 import { InGameState } from './inGameState.js';
 
 function main(argv: {[key: string]: string}) {
@@ -6,7 +6,7 @@ function main(argv: {[key: string]: string}) {
 
     const initialState = new InGameState("In Game");
 
-    const gameContext = new GameContext(
+    const gameContext = new Context(
         initialState,
         debugEnabled
     );
