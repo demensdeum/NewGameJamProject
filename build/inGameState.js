@@ -24,7 +24,9 @@ var InGameState = /** @class */ (function () {
             (_a = this.context) === null || _a === void 0 ? void 0 : _a.debugPrint("xDiff:" + xDiff + "; y: " + value[1]);
             this.moveObjectByDiffX("player car", xDiff);
             this.moveObjectByDiffX("camera", xDiff);
+            this.moveObjectByDiffX(Identifiers.skyboxLeft, xDiff);
             this.moveObjectByDiffX(Identifiers.skyboxFront, xDiff);
+            this.moveObjectByDiffX(Identifiers.skyboxRight, xDiff);
         }
     };
     InGameState.prototype.initialize = function (context) {

@@ -1,5 +1,5 @@
 export enum Identifiers {
-    skyboxFront = "skyboxFront",
     skyboxLeft = "skyboxLeft",
+    skyboxFront = "skyboxFront",    
     skyboxRight = "skyboxRight",
 };

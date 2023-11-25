@@ -55,7 +55,9 @@ export class InGameState implements State, InputControllerDelegate {
         this.context?.debugPrint("xDiff:"+xDiff+"; y: " + value[1]);
         this.moveObjectByDiffX("player car", xDiff);
         this.moveObjectByDiffX("camera", xDiff);
+        this.moveObjectByDiffX(Identifiers.skyboxLeft, xDiff);
         this.moveObjectByDiffX(Identifiers.skyboxFront, xDiff);
+        this.moveObjectByDiffX(Identifiers.skyboxRight, xDiff);
       }
   }
 
