@@ -1,5 +1,6 @@
 import { Context } from "./context.js"
 import { Utils } from './utils.js'
+import { SceneObject } from "./sceneObject.js";
 
 export class SceneController {
 
@@ -11,7 +12,7 @@ export class SceneController {
     private textureLoader: any;
 
     private context: Context;
-    private objects: [any];
+    private objects: [SceneObject];
 
     constructor(context: Context) {
         this.context = context;
@@ -26,8 +27,13 @@ export class SceneController {
         0.1,
         1000
     );
-    this.camera.name = "camera";
-    this.objects = [this.camera];    
+
+    const cameraSceneObject = new SceneObject(
+        "camera",
+        this.camera
+    );
+
+    this.objects = [cameraSceneObject];    
 // @ts-ignore      
       this.renderer = new THREE.WebGLRenderer();
       this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -46,7 +52,7 @@ export class SceneController {
         return this.textureLoader.load("./data/failbackTexture.png")
     }
 
-    private addObject(object: any): void {
+    private addSceneObject(object: SceneObject): void {
         // @ts-ignore
         const alreadyAddedObject = this.objects.find(obj => obj.name === object.name);
 
@@ -56,7 +62,7 @@ export class SceneController {
         }
 
         this.objects.push(object);
-        this.scene.add(object);
+        this.scene.add(object.threeObject);
     }
 
     public addBackground(): void {
@@ -87,11 +93,15 @@ export class SceneController {
         const boxMaterial = new THREE.MeshBasicMaterial({ color: color });
         // @ts-ignore
         const box = new THREE.Mesh(boxGeometry, boxMaterial);
-        box.name = name;
         box.position.x = x;
         box.position.y = y;
         box.position.z = z;
-        this.addObject(box);
+
+        const sceneObject = new SceneObject(
+            name,
+            box
+        );
+        this.addSceneObject(sceneObject);
     }
 
     public addPlaneAt(
@@ -122,11 +132,15 @@ export class SceneController {
         });
         // @ts-ignore
         const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-        plane.name = name;
         plane.position.x = x;
         plane.position.y = y;
         plane.position.z = z;
-        this.addObject(plane);
+
+        const sceneObject = new SceneObject(
+            name,
+            plane
+        );
+        this.addSceneObject(sceneObject);
     }    
 
     public addCarAt(
@@ -169,9 +183,18 @@ export class SceneController {
           );        
     }
 
-    private objectWithName(
+    public sceneObjectPosition(
         name: string
     ): any
+    {
+        const outputObject = this.sceneObject(name);
+        const outputPosition = outputObject.threeObject.position;
+        return outputPosition;
+    }
+
+    private sceneObject(
+        name: string
+    ): SceneObject
     {
         // @ts-ignore
         var object = this.objects.find(obj => obj.name === name);
@@ -184,7 +207,7 @@ export class SceneController {
                 0,
                 0x0000FF
             );
-            return this.objectWithName(name);
+            return this.sceneObject(name);
         }
         return object;
     }
@@ -195,10 +218,10 @@ export class SceneController {
         y: number,
         z: number
     ): void {
-        const object = this.objectWithName(name);
-        object.position.x = x;
-        object.position.y = y;
-        object.position.z = z;
+        const sceneObject = this.sceneObject(name);
+        sceneObject.threeObject.position.x = x;
+        sceneObject.threeObject.position.y = y;
+        sceneObject.threeObject.position.z = z;
     }
 
     public rotateObject(
@@ -208,9 +231,9 @@ export class SceneController {
         z: number
     ): void
     {
-        const object = this.objectWithName(name);
-        object.rotation.x = x;
-        object.rotation.y = y;
-        object.rotation.z = z;
+        const sceneObject = this.sceneObject(name);
+        sceneObject.threeObject.rotation.x = x;
+        sceneObject.threeObject.rotation.y = y;
+        sceneObject.threeObject.rotation.z = z;
     }
 }

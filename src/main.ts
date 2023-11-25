@@ -4,18 +4,22 @@ import { InGameState } from './inGameState.js';
 function main(argv: {[key: string]: string}) {
     var debugEnabled = argv["debugEnabled"] === "true";
 
-    const initialState = new InGameState("In Game");
-
-    const gameContext = new Context(
-        initialState,
+    const context = new Context(
         debugEnabled
     );
     
+    const initialState = new InGameState(
+        "In Game",
+        context.sceneController
+    );
+
+    context.start(initialState);
+
     function step() {
-        if (!gameContext.isRunning) {
+        if (!context.isRunning) {
             return;
         }
-        gameContext.step();
+        context.step();
         requestAnimationFrame(step);
     }
 

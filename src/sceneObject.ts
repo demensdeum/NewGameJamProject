@@ -1,8 +1,12 @@
 export class SceneObject {
-    public threeObject: any;
     public name: string;
+    public threeObject: any;    
 
-    constructor(name: string) {
+    constructor(
+        name: string,
+        threeObject: any
+    ) {
         this.name = name;
+        this.threeObject = threeObject;
     }
 }
