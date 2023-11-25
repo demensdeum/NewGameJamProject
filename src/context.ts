@@ -3,6 +3,8 @@ import { SceneController } from './sceneController.js';
 import { IdleState } from './idleState.js';
 import { InputController } from './inputController.js';
 import { InputControllerDelegate } from './inputControllerDelegate.js';
+import { GameInputEvent } from './gameInputEvent.js';
+import { GameInputKeyboardEvent } from './gameInputKeyboardEvent.js';
 
 export class Context implements InputControllerDelegate {
   public isRunning: boolean = false;
@@ -73,10 +75,11 @@ export class Context implements InputControllerDelegate {
     console.log(text)
   }  
 
-  public inputControllerDidReceive(
+  public inputControllerDidReceive<T>(
     inputController: InputController,
-    inputEvent: InputEvent
+    inputEvent: GameInputEvent<T>
   ): void {
-    this.debugPrint("derp derp derp");
+    this.debugPrint("inputControllerDidReceive");
+    this.state.inputControllerDidReceive(inputController, inputEvent);
   }
 }

@@ -1,5 +1,7 @@
+import { GameInputMouseEvent } from "./gameInputMouseEvent.js";
 var InputController = /** @class */ (function () {
     function InputController(context, canvas, delegate) {
+        this.isTouching = false;
         this.context = context;
         this.canvas = canvas;
         this.delegate = delegate;
@@ -28,6 +30,8 @@ var InputController = /** @class */ (function () {
             return;
         }
         this.context.debugPrint("onMouseMove");
+        var mouseEvent = new GameInputMouseEvent([event.x, event.y]);
+        this.delegate.inputControllerDidReceive(this, mouseEvent);
     };
     InputController.prototype.onTouchStart = function (event) {
         this.context.debugPrint("onTouchStart");

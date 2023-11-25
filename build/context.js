@@ -45,7 +45,8 @@ var Context = /** @class */ (function () {
         console.log(text);
     };
     Context.prototype.inputControllerDidReceive = function (inputController, inputEvent) {
-        this.debugPrint("derp derp derp");
+        this.debugPrint("inputControllerDidReceive");
+        this.state.inputControllerDidReceive(inputController, inputEvent);
     };
     return Context;
 }());

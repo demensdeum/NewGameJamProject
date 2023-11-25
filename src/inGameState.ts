@@ -2,8 +2,11 @@ import { State } from './state';
 import { Context } from './context';
 import { Utils } from './utils.js'
 import { SceneController } from './sceneController.js';
+import { InputControllerDelegate } from './inputControllerDelegate';
+import { GameInputEvent } from './gameInputEvent';
+import { InputController } from './inputController';
 
-export class InGameState implements State {
+export class InGameState implements State, InputControllerDelegate {
   
   private readonly roadSegmentsColumnsCount: number = 4;
   private readonly roadSegmentsRowsCount: number = 25;
@@ -22,6 +25,12 @@ export class InGameState implements State {
   ) {
     this.name = name;
     this.sceneController = sceneController;
+  }
+
+  inputControllerDidReceive<T>(
+    inputController: InputController, 
+    inputEvent: GameInputEvent<T>): void {
+    this.context?.debugPrint("YO!!!!!!");
   }
 
   public initialize(

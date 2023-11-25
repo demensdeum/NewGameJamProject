@@ -1,8 +1,9 @@
 import { InputController } from "./inputController"
+import { GameInputEvent } from "./gameInputEvent"
 
 export interface InputControllerDelegate {
-    inputControllerDidReceive(
+    inputControllerDidReceive<T>(
         inputController: InputController,
-        inputEvent: InputEvent
+        inputEvent: GameInputEvent<T>
     ): void;
 }

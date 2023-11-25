@@ -7,6 +7,10 @@ var InGameState = /** @class */ (function () {
         this.name = name;
         this.sceneController = sceneController;
     }
+    InGameState.prototype.inputControllerDidReceive = function (inputController, inputEvent) {
+        var _a;
+        (_a = this.context) === null || _a === void 0 ? void 0 : _a.debugPrint("YO!!!!!!");
+    };
     InGameState.prototype.initialize = function (context) {
         this.context = context;
         this.sceneController = context.sceneController;

@@ -1,9 +1,10 @@
 import { InputControllerDelegate } from "./inputControllerDelegate"
 import { Context } from "./context"
+import { GameInputMouseEvent } from "./gameInputMouseEvent.js";
 
 export class InputController {
 
-    private isTouching: boolean;
+    private isTouching: boolean = false;
     private context: Context;
     private canvas: HTMLCanvasElement;
     private delegate: InputControllerDelegate;
@@ -45,6 +46,8 @@ export class InputController {
             return;
         }
         this.context.debugPrint("onMouseMove");
+        const mouseEvent = new GameInputMouseEvent([event.x, event.y]);
+        this.delegate.inputControllerDidReceive(this, mouseEvent);
     }      
 
     private onTouchStart(event: TouchEvent) {
