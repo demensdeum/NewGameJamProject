@@ -37,7 +37,27 @@ export class SceneController {
 // @ts-ignore      
       this.renderer = new THREE.WebGLRenderer();
       this.renderer.setSize(window.innerWidth, window.innerHeight);
-      document.body.appendChild(this.renderer.domElement);        
+      document.body.appendChild(this.renderer.domElement);      
+      
+      const camera = this.camera;
+      const renderer = this.renderer;
+
+      function onWindowResize() {
+
+        console.log("RESIZE!!!!!!!!");
+
+        // Update camera aspect ratio
+        // @ts-ignore
+        camera.aspect = window.innerWidth / window.innerHeight;
+        // @ts-ignore
+        camera.updateProjectionMatrix();
+      
+        // Update renderer size
+        // @ts-ignore
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      }      
+
+      window.addEventListener('resize', onWindowResize, false);
     }
 
     public step() {
