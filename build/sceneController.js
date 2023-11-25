@@ -1,6 +1,9 @@
 import { Utils } from './utils.js';
 import { SceneObject } from "./sceneObject.js";
 import { Identifiers } from "./identifiers.js";
+// @ts-ignore
+import * as dat from '/libs/dat.gui.module.js';
+var gui = new dat.GUI();
 var SceneController = /** @class */ (function () {
     function SceneController(context, canvas) {
         this.context = context;
@@ -52,6 +55,20 @@ var SceneController = /** @class */ (function () {
         this.objects.push(object);
         this.scene.add(object.threeObject);
     };
+    SceneController.prototype.addUI = function (gameData) {
+        var scoreView = gui
+            .add(gameData, 'score')
+            .name("Score");
+        gui.add(gameData, 'speed')
+            .name("Speed")
+            .step(0.01);
+        scoreView.domElement.style.pointerEvents = "none";
+    };
+    SceneController.prototype.updateUI = function () {
+        for (var i in gui.__controllers) {
+            gui.__controllers[i].updateDisplay();
+        }
+    };
     SceneController.prototype.addSkybox = function () {
         this.addPlaneAt(Identifiers.skyboxFront, 0, 0, -0.5, 1, 1, "data/background.png", 0x0000FF, true);
         this.addPlaneAt(Identifiers.skyboxLeft, 0, 0, -0.5, 1, 1, "data/background.png", 0x00FFFF, true);
@@ -61,12 +78,17 @@ var SceneController = /** @class */ (function () {
         this.rotateObject(Identifiers.skyboxRight, 0, Utils.angleToRadians(90), 0);
         this.moveObjectTo(Identifiers.skyboxRight, 0.5, 0, 0);
     };
-    SceneController.prototype.addBoxAt = function (name, x, y, z, color) {
+    SceneController.prototype.addBoxAt = function (name, x, y, z, texturePath, color) {
+        if (color === void 0) { color = 0x00FFFF; }
         this.context.debugPrint("addCubeAt");
+        var texture = this.loadTexture(texturePath);
         // @ts-ignore
         var boxGeometry = new THREE.BoxGeometry(1, 1, 1);
         // @ts-ignore
-        var boxMaterial = new THREE.MeshBasicMaterial({ color: color });
+        var boxMaterial = new THREE.MeshBasicMaterial({
+            color: color,
+            map: texture
+        });
         // @ts-ignore
         var box = new THREE.Mesh(boxGeometry, boxMaterial);
         box.position.x = x;
@@ -101,7 +123,7 @@ var SceneController = /** @class */ (function () {
     };
     SceneController.prototype.addCarAt = function (name, x, y, z) {
         this.context.debugPrint("addCarAt");
-        this.addBoxAt(name, x, y, z, 0x00FF00);
+        this.addBoxAt(name, x, y, z, "./data/carTexture.png");
     };
     SceneController.prototype.addRoadSegmentAt = function (name, x, y, z) {
         this.context.debugPrint("addRoadSegmentAt");
@@ -113,12 +135,15 @@ var SceneController = /** @class */ (function () {
         var outputPosition = outputObject.threeObject.position;
         return outputPosition;
     };
+    SceneController.prototype.addItemAt = function (name, x, y, z) {
+        var item = this.addBoxAt(name, x, y, z, "./data/itemTexture.png", 0x00FFFF);
+    };
     SceneController.prototype.sceneObject = function (name) {
         // @ts-ignore
         var object = this.objects.find(function (obj) { return obj.name === name; });
         if (!object || object == undefined) {
             this.context.debugPrint("Can't find object with name: {" + name + "}!!!!!");
-            this.addBoxAt(name, 0, 0, 0, 0x0000FF);
+            this.addBoxAt(name, 0, 0, 0, "./data/failbackTexture.png");
             return this.sceneObject(name);
         }
         return object;

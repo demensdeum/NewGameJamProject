@@ -1,6 +1,7 @@
 var IdleState = /** @class */ (function () {
-    function IdleState() {
+    function IdleState(context) {
         this.name = "Idle";
+        this.context = context;
     }
     IdleState.prototype.initialize = function (context) {
         this.context = context;

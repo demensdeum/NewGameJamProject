@@ -10,6 +10,7 @@ function main(argv: {[key: string]: string}) {
     
     const initialState = new InGameState(
         "In Game",
+        context,
         context.sceneController
     );
 

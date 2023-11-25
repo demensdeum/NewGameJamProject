@@ -2,6 +2,12 @@ import { Context } from "./context.js"
 import { Utils } from './utils.js'
 import { SceneObject } from "./sceneObject.js";
 import { Identifiers } from "./identifiers.js";
+// @ts-ignore
+import * as dat from '/libs/dat.gui.module.js';
+import { GameData } from "./gameData.js";
+import { SceneObjectIdentifier } from "./sceneObjectIdentifier.js";
+
+const gui = new dat.GUI();
 
 export class SceneController {
 
@@ -91,6 +97,22 @@ export class SceneController {
         this.scene.add(object.threeObject);
     }
 
+    public addUI(gameData: GameData): void {
+        const scoreView = gui
+            .add(gameData, 'score')
+            .name("Score");
+        gui.add(gameData, 'speed')
+            .name("Speed")
+            .step(0.01);
+        scoreView.domElement.style.pointerEvents = "none"
+    }
+
+    public updateUI(): void {
+        for (const i in gui.__controllers) {
+            gui.__controllers[i].updateDisplay();
+        }
+    }
+
     public addSkybox(): void {
         this.addPlaneAt(
             Identifiers.skyboxFront,
@@ -158,13 +180,18 @@ export class SceneController {
         x: number,
         y: number,
         z: number,
-        color: number
+        texturePath: string,        
+        color: number = 0x00FFFF
     ): void {
         this.context.debugPrint("addCubeAt");
+        const texture = this.loadTexture(texturePath);
         // @ts-ignore
         const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
         // @ts-ignore
-        const boxMaterial = new THREE.MeshBasicMaterial({ color: color });
+        const boxMaterial = new THREE.MeshBasicMaterial({
+             color: color,
+             map: texture
+        });
         // @ts-ignore
         const box = new THREE.Mesh(boxGeometry, boxMaterial);
         box.position.x = x;
@@ -229,7 +256,7 @@ export class SceneController {
             x,
             y,
             z,
-            0x00FF00
+            "./data/carTexture.png"
         )
     }
 
@@ -266,6 +293,23 @@ export class SceneController {
         return outputPosition;
     }
 
+    public addItemAt(
+        name: SceneObjectIdentifier,
+        x: number,
+        y: number,
+        z: number
+    ): void
+    {
+        const item = this.addBoxAt(
+            name,
+            x,
+            y,
+            z,
+            "./data/itemTexture.png",
+            0x00FFFF
+        )
+    }
+
     private sceneObject(
         name: string
     ): SceneObject
@@ -279,7 +323,7 @@ export class SceneController {
                 0, 
                 0, 
                 0,
-                0x0000FF
+                "./data/failbackTexture.png"
             );
             return this.sceneObject(name);
         }

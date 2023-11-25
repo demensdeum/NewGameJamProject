@@ -7,7 +7,14 @@ import { InputController } from "./inputController.js";
 export class IdleState implements State, InputControllerDelegate {
 
     public name: string = "Idle";
-    private context?: Context;
+    private context: Context;
+
+    constructor(
+        context: Context
+    )
+    {
+        this.context = context;
+    }
 
     public initialize(context: Context): void {
         this.context = context;

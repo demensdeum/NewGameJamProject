@@ -3,7 +3,8 @@
       "outDir": "./build",
       "module": "ESNext",
       "strict": true,
-      "noImplicitReturns": true
+      "noImplicitReturns": true,
+      "lib": ["es2017", "dom"]
     },
     "include": [
       "src/**/*.ts"

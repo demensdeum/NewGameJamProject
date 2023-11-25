@@ -3,7 +3,7 @@ import { InGameState } from './inGameState.js';
 function main(argv) {
     var debugEnabled = argv["debugEnabled"] === "true";
     var context = new Context(debugEnabled);
-    var initialState = new InGameState("In Game", context.sceneController);
+    var initialState = new InGameState("In Game", context, context.sceneController);
     context.start(initialState);
     function step() {
         if (!context.isRunning) {

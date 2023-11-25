@@ -5,10 +5,12 @@ import { InputController } from './inputController.js';
 import { InputControllerDelegate } from './inputControllerDelegate.js';
 import { GameInputEvent } from './gameInputEvent.js';
 import { GameInputKeyboardEvent } from './gameInputKeyboardEvent.js';
+import { GameData } from './gameData.js';
 
 export class Context implements InputControllerDelegate {
   public isRunning: boolean = false;
   public sceneController: SceneController;
+  public gameData: GameData;
 
   private readonly canvas?: HTMLCanvasElement | null = document.querySelector("canvas");
   private inputController: InputController;
@@ -18,8 +20,9 @@ export class Context implements InputControllerDelegate {
   constructor(
     debugEnabled: boolean
   ) {
-      this.debugEnabled = debugEnabled;    
-      this.state = new IdleState();
+      this.debugEnabled = debugEnabled; 
+      this.gameData = new GameData();   
+      this.state = new IdleState(this);
 
       if (!this.canvas || this.canvas == undefined) {
         this.raiseCriticalError("1Canvas in NULL!!!!");

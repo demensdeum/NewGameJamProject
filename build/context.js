@@ -1,12 +1,14 @@
 import { SceneController } from './sceneController.js';
 import { IdleState } from './idleState.js';
 import { InputController } from './inputController.js';
+import { GameData } from './gameData.js';
 var Context = /** @class */ (function () {
     function Context(debugEnabled) {
         this.isRunning = false;
         this.canvas = document.querySelector("canvas");
         this.debugEnabled = debugEnabled;
-        this.state = new IdleState();
+        this.gameData = new GameData();
+        this.state = new IdleState(this);
         if (!this.canvas || this.canvas == undefined) {
             this.raiseCriticalError("1Canvas in NULL!!!!");
         }
