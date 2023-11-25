@@ -1,8 +1,9 @@
 import { Utils } from './utils.js';
 import { SceneObject } from "./sceneObject.js";
 var SceneController = /** @class */ (function () {
-    function SceneController(context) {
+    function SceneController(context, canvas) {
         this.context = context;
+        this.canvas = canvas;
         // @ts-ignore
         this.textureLoader = new THREE.TextureLoader();
         // @ts-ignore
@@ -12,19 +13,19 @@ var SceneController = /** @class */ (function () {
         var cameraSceneObject = new SceneObject("camera", this.camera);
         this.objects = [cameraSceneObject];
         // @ts-ignore      
-        this.renderer = new THREE.WebGLRenderer();
+        this.renderer = new THREE.WebGLRenderer({
+            canvas: canvas,
+            antialias: true
+        });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(this.renderer.domElement);
         var camera = this.camera;
         var renderer = this.renderer;
         function onWindowResize() {
-            console.log("RESIZE!!!!!!!!");
-            // Update camera aspect ratio
             // @ts-ignore
             camera.aspect = window.innerWidth / window.innerHeight;
             // @ts-ignore
             camera.updateProjectionMatrix();
-            // Update renderer size
             // @ts-ignore
             renderer.setSize(window.innerWidth, window.innerHeight);
         }

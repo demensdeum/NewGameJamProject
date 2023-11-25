@@ -2,7 +2,7 @@ import { Context } from './context.js';
 import { InGameState } from './inGameState.js';
 
 function main(argv: {[key: string]: string}) {
-    var debugEnabled = argv["debugEnabled"] === "true";
+    const debugEnabled = argv["debugEnabled"] === "true";
 
     const context = new Context(
         debugEnabled

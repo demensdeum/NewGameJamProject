@@ -1,19 +1,38 @@
 import { State } from './state.js';
 import { SceneController } from './sceneController.js';
-import { IdleState } from './IdleState.js';
+import { IdleState } from './idleState.js';
+import { InputController } from './inputController.js';
+import { InputControllerDelegate } from './inputControllerDelegate.js';
 
-export class Context {
+export class Context implements InputControllerDelegate {
   public isRunning: boolean = false;
   public sceneController: SceneController;
+
+  private readonly canvas?: HTMLCanvasElement | null = document.querySelector("canvas");
+  private inputController: InputController;
   private state: State;
   private debugEnabled: boolean;
 
   constructor(
     debugEnabled: boolean
   ) {
+      this.debugEnabled = debugEnabled;    
       this.state = new IdleState();
-      this.sceneController = new SceneController(this);
-      this.debugEnabled = debugEnabled;
+
+      if (!this.canvas || this.canvas == undefined) {
+        this.raiseCriticalError("1Canvas in NULL!!!!");
+      }
+      const canvas = this.canvas!;
+
+      this.inputController = new InputController(
+        this,
+        canvas,
+        this
+      );
+      this.sceneController = new SceneController(
+        this,
+        canvas
+      );
       this.debugPrint("Game Context Initialized...");
   }
 
@@ -53,4 +72,11 @@ export class Context {
     }
     console.log(text)
   }  
+
+  public inputControllerDidReceive(
+    inputController: InputController,
+    inputEvent: InputEvent
+  ): void {
+    this.debugPrint("derp derp derp");
+  }
 }

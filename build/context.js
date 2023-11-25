@@ -1,11 +1,18 @@
 import { SceneController } from './sceneController.js';
-import { IdleState } from './IdleState.js';
+import { IdleState } from './idleState.js';
+import { InputController } from './inputController.js';
 var Context = /** @class */ (function () {
     function Context(debugEnabled) {
         this.isRunning = false;
-        this.state = new IdleState();
-        this.sceneController = new SceneController(this);
+        this.canvas = document.querySelector("canvas");
         this.debugEnabled = debugEnabled;
+        this.state = new IdleState();
+        if (!this.canvas || this.canvas == undefined) {
+            this.raiseCriticalError("1Canvas in NULL!!!!");
+        }
+        var canvas = this.canvas;
+        this.inputController = new InputController(this, canvas, this);
+        this.sceneController = new SceneController(this, canvas);
         this.debugPrint("Game Context Initialized...");
     }
     Context.prototype.start = function (state) {
@@ -36,6 +43,9 @@ var Context = /** @class */ (function () {
             return;
         }
         console.log(text);
+    };
+    Context.prototype.inputControllerDidReceive = function (inputController, inputEvent) {
+        this.debugPrint("derp derp derp");
     };
     return Context;
 }());
