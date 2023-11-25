@@ -19,8 +19,18 @@ export class Context {
       this.transitionTo(this.state);
   }
 
+  public raiseCriticalError(error: string) {
+    if (this.debugEnabled) {
+      console.error(error);
+    }
+    else {
+      alert(error);
+    }
+    this.isRunning = false;
+  }
+
   public transitionTo(state: State): void {
-    console.log(`Transitioning to ${state.name}`);
+    this.debugPrint(`Transitioning to ${state.name}`);
     this.state = state;
     this.state.initialize(this);
   }

@@ -25,6 +25,16 @@ var SceneController = /** @class */ (function () {
         }
         return this.textureLoader.load("./data/failbackTexture.png");
     };
+    SceneController.prototype.addObject = function (object) {
+        // @ts-ignore
+        var alreadyAddedObject = this.objects.find(function (obj) { return obj.name === object.name; });
+        if (alreadyAddedObject) {
+            this.context.raiseCriticalError("Duplicate name for object!!!:" + object.name);
+            return;
+        }
+        this.objects.push(object);
+        this.scene.add(object);
+    };
     SceneController.prototype.addBoxAt = function (name, x, y, z, color) {
         this.context.debugPrint("addCubeAt");
         // @ts-ignore
@@ -37,8 +47,7 @@ var SceneController = /** @class */ (function () {
         box.position.x = x;
         box.position.y = y;
         box.position.z = z;
-        this.scene.add(box);
-        this.objects.push(box);
+        this.addObject(box);
     };
     SceneController.prototype.addPlaneAt = function (name, x, y, z, width, height) {
         this.context.debugPrint("addPlaneAt");
@@ -57,8 +66,7 @@ var SceneController = /** @class */ (function () {
         plane.position.x = x;
         plane.position.y = y;
         plane.position.z = z;
-        this.scene.add(plane);
-        this.objects.push(plane);
+        this.addObject(plane);
     };
     SceneController.prototype.addCarAt = function (name, x, y, z) {
         this.context.debugPrint("addCarAt");
@@ -66,7 +74,7 @@ var SceneController = /** @class */ (function () {
     };
     SceneController.prototype.addRoadSegmentAt = function (name, x, y, z) {
         this.context.debugPrint("addRoadSegmentAt");
-        this.addPlaneAt(name, x, y, z, 4, 4);
+        this.addPlaneAt(name, x, y, z, SceneController.roadSegmentSize, SceneController.roadSegmentSize);
         this.rotateObject(name, Utils.angleToRadians(-90), 0, 0);
     };
     SceneController.prototype.objectWithName = function (name) {
@@ -91,6 +99,7 @@ var SceneController = /** @class */ (function () {
         object.rotation.y = y;
         object.rotation.z = z;
     };
+    SceneController.roadSegmentSize = 4;
     return SceneController;
 }());
 export { SceneController };

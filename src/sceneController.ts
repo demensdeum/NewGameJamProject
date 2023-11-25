@@ -3,6 +3,8 @@ import { Utils } from './utils.js'
 
 export class SceneController {
 
+    public static readonly roadSegmentSize: number = 4;
+
     private scene: any;
     private camera: any;
     private renderer: any;
@@ -44,6 +46,19 @@ export class SceneController {
         return this.textureLoader.load("./data/failbackTexture.png")
     }
 
+    private addObject(object: any): void {
+        // @ts-ignore
+        const alreadyAddedObject = this.objects.find(obj => obj.name === object.name);
+
+        if (alreadyAddedObject) {
+            this.context.raiseCriticalError("Duplicate name for object!!!:" + object.name);
+            return;
+        }
+
+        this.objects.push(object);
+        this.scene.add(object);
+    }
+
     public addBoxAt(
         name: string,
         x: number,
@@ -62,8 +77,7 @@ export class SceneController {
         box.position.x = x;
         box.position.y = y;
         box.position.z = z;
-        this.scene.add(box);
-        this.objects.push(box);
+        this.addObject(box);
     }
 
     public addPlaneAt(
@@ -92,8 +106,7 @@ export class SceneController {
         plane.position.x = x;
         plane.position.y = y;
         plane.position.z = z;
-        this.scene.add(plane);
-        this.objects.push(plane);
+        this.addObject(plane);
     }    
 
     public addCarAt(
@@ -124,8 +137,8 @@ export class SceneController {
             x,
             y,
             z,
-            4,
-            4
+            SceneController.roadSegmentSize,
+            SceneController.roadSegmentSize
         ) 
         this.rotateObject(
             name,

@@ -12,6 +12,9 @@ function main(argv: {[key: string]: string}) {
     );
     
     function step() {
+        if (!gameContext.isRunning) {
+            return;
+        }
         gameContext.step();
         requestAnimationFrame(step);
     }

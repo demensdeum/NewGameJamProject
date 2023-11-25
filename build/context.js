@@ -8,8 +8,17 @@ var Context = /** @class */ (function () {
         this.isRunning = true;
         this.transitionTo(this.state);
     }
+    Context.prototype.raiseCriticalError = function (error) {
+        if (this.debugEnabled) {
+            console.error(error);
+        }
+        else {
+            alert(error);
+        }
+        this.isRunning = false;
+    };
     Context.prototype.transitionTo = function (state) {
-        console.log("Transitioning to ".concat(state.name));
+        this.debugPrint("Transitioning to ".concat(state.name));
         this.state = state;
         this.state.initialize(this);
     };

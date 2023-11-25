@@ -5,6 +5,9 @@ function main(argv) {
     var initialState = new InGameState("In Game");
     var gameContext = new Context(initialState, debugEnabled);
     function step() {
+        if (!gameContext.isRunning) {
+            return;
+        }
         gameContext.step();
         requestAnimationFrame(step);
     }
