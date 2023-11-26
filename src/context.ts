@@ -8,6 +8,7 @@ import { GameInputKeyboardEvent } from './gameInputKeyboardEvent.js';
 import { GameData } from './gameData.js';
 import { LiveUpdateWebSocketClient } from './liveUpdateSocketClient.js';
 import { Translator } from './translator.js';
+import { SoundPlayer } from './soundPlayer.js';
 
 export class Context implements InputControllerDelegate {
   public isRunning: boolean = false;
@@ -20,6 +21,7 @@ export class Context implements InputControllerDelegate {
   private state: State;
   private debugEnabled: boolean;
   private liveUpdateWebSocketClient = new LiveUpdateWebSocketClient("localhost:8766");
+  public soundPlayer: SoundPlayer = new SoundPlayer();
 
   constructor(
     debugEnabled: boolean
@@ -33,6 +35,8 @@ export class Context implements InputControllerDelegate {
         this.raiseCriticalError("1Canvas in NULL!!!!");
       }
       const canvas = this.canvas!;
+
+      this.soundPlayer.add("./assets/beep.ogg");
 
       this.inputController = new InputController(
         this,

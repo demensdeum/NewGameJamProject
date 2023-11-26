@@ -103,6 +103,7 @@ export class InGameState {
             if (this.sceneController.objectCollidesWithObject(Names.playerCar, itemName)) {
                 this.gameData.score += 100;
                 this.hideItem(itemName);
+                this.context.soundPlayer.play("./assets/beep.ogg");
             }
             else {
                 continue;

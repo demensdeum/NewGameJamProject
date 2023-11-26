@@ -4,11 +4,13 @@ import { InputController } from './inputController.js';
 import { GameData } from './gameData.js';
 import { LiveUpdateWebSocketClient } from './liveUpdateSocketClient.js';
 import { Translator } from './translator.js';
+import { SoundPlayer } from './soundPlayer.js';
 export class Context {
     constructor(debugEnabled) {
         this.isRunning = false;
         this.canvas = document.querySelector("canvas");
         this.liveUpdateWebSocketClient = new LiveUpdateWebSocketClient("localhost:8766");
+        this.soundPlayer = new SoundPlayer();
         this.debugEnabled = debugEnabled;
         this.gameData = new GameData();
         this.translator = new Translator("en");
@@ -17,6 +19,7 @@ export class Context {
             this.raiseCriticalError("1Canvas in NULL!!!!");
         }
         const canvas = this.canvas;
+        this.soundPlayer.add("./assets/beep.ogg");
         this.inputController = new InputController(this, canvas, this);
         this.sceneController = new SceneController(this, canvas);
         this.debugPrint("Game Context Initialized...");
