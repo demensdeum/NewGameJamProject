@@ -7,7 +7,7 @@
       "lib": ["es2017", "dom"]
     },
     "include": [
-      "src/**/*.ts"
+      "src-preprocessed/**/*.ts"
     ],
     "exclude": [
       "node_modules"

@@ -15,16 +15,14 @@ import { SceneObjectIdentifier, SceneObjectIdentifier as SceneObjectName } from 
 
 export class InGameState implements State, InputControllerDelegate {
   
-  private readonly roadSegmentsColumnsCount: number = 4;
+  private readonly roadSegmentsColumnsCount: number = 10;
   private readonly roadSegmentsRowsCount: number = 25;
-  private readonly itemsCount: number = 10;
+  private readonly itemsCount: number = 20;
   private readonly floorY: number = -2;
-  private readonly boxSize: number = 1;
 
   private speedLimit: number = 0.4;
   private objectsPool: ObjectsPool<SceneObjectName>;
 
-  public static roadSegmentsXOffset: number = -(SceneController.roadSegmentSize + SceneController.roadSegmentSize / 2);
   public name: string;
 
   private sceneController: SceneController;
@@ -59,6 +57,22 @@ export class InGameState implements State, InputControllerDelegate {
     );
   };
 
+  private leftBorderX() {
+    return -SceneController.roadSegmentSize / 2;
+  }
+
+  private rightBorderX() {
+    return this.roadSegmentsColumnsCount * SceneController.roadSegmentSize - SceneController.carSize;
+  }
+
+  private minimalCarX() {
+    return -SceneController.roadSegmentSize / 4;
+  }
+
+  private maximalCarX() {
+    return this.roadSegmentsColumnsCount * SceneController.roadSegmentSize - (SceneController.carSize + SceneController.carSize.half());
+  }
+
   public inputControllerDidReceive<T>(
     inputController: InputController, 
     inputEvent: GameInputEvent<T>): void {
@@ -66,13 +80,39 @@ export class InGameState implements State, InputControllerDelegate {
         const value = inputEvent.value;
         const inputX = value[0];
         const xDiff = inputX;
-        this.context?.debugPrint("xDiff:"+xDiff+"; y: " + value[1]);
-        this.moveObjectByDiffX("player car", xDiff);
-        this.moveObjectByDiffX("camera", xDiff);
-        this.moveObjectByDiffX(Identifiers.skyboxLeft, xDiff);
-        this.moveObjectByDiffX(Identifiers.skyboxFront, xDiff);
-        this.moveObjectByDiffX(Identifiers.skyboxRight, xDiff);
+        const position = this.sceneController.sceneObjectPosition(Identifiers.playerCar);
+        var newX = position.x + xDiff;
+        const carLeftPointX = (position.x + xDiff) - SceneController.carSize / 2;
+        const carRightPointX = (position.x + xDiff) + SceneController.carSize / 2;
+        if (xDiff < 0 && carLeftPointX < this.leftBorderX()) {
+          this.context.debugPrint("blocked L");
+          newX = this.minimalCarX();
+        }
+        if (xDiff > 0 && carRightPointX > this.rightBorderX()) {
+          this.context.debugPrint("blocked R");
+          newX = this.maximalCarX();
+        }
+        const leftSkyBoxX = newX - SceneController.skyboxPositionDiffX;
+        const rightSkyBoxX = newX + SceneController.skyboxPositionDiffX;
+        this.changeObjectX(Identifiers.playerCar, newX);
+        this.changeObjectX(Identifiers.camera, newX);
+        this.changeObjectX(Identifiers.skyboxLeft, leftSkyBoxX);
+        this.changeObjectX(Identifiers.skyboxFront, newX);
+        this.changeObjectX(Identifiers.skyboxRight, rightSkyBoxX);
       }
+  }
+
+  private changeObjectX(name: SceneObjectIdentifier, x: number) {
+    const position = this.sceneController.sceneObjectPosition(
+      name
+    );
+    position.x = x;
+    this.sceneController.moveObjectTo(
+      name,
+      position.x,
+      position.y,
+      position.z
+    )
   }
 
   public initialize(
@@ -84,16 +124,16 @@ export class InGameState implements State, InputControllerDelegate {
     this.sceneController.addSkybox();
 
     this.sceneController.addCarAt(
-      "player car",
+      Identifiers.playerCar,
       0, 
-      this.floorY + this.boxSize*0.5, 
+      this.floorY + SceneController.carSize * 0.5, 
       -4
     );
 
     for (let x = 0; x < this.roadSegmentsColumnsCount; x++) {
       for (let z = 0; z < this.roadSegmentsRowsCount; z++) {
         const name = this.roadSegmentName(x, z);
-        const roadSegmentX = x * SceneController.roadSegmentSize + InGameState.roadSegmentsXOffset;
+        const roadSegmentX = x * SceneController.roadSegmentSize;
         const roadSegmentZ = -z * SceneController.roadSegmentSize;
         this.sceneController.addRoadSegmentAt(
           name,
@@ -116,7 +156,7 @@ export class InGameState implements State, InputControllerDelegate {
       this.sceneController.addItemAt(
         name,
         0,
-        this.floorY + this.boxSize * 0.5,
+        this.floorY + SceneController.carSize * 0.5,
         0
       );
 
@@ -133,7 +173,7 @@ export class InGameState implements State, InputControllerDelegate {
 
   private randomizeItemStartPosition(name: SceneObjectIdentifier) {
     const position = this.sceneController.sceneObjectPosition(name);
-    position.x = Utils.randomInt(4) * SceneController.roadSegmentSize + InGameState.roadSegmentsXOffset;
+    position.x = Utils.randomInt(this.roadSegmentsColumnsCount) * SceneController.roadSegmentSize;
     position.z = this.horizonDotZ() + Utils.randomInt(this.roadSegmentsRowsCount) * SceneController.roadSegmentSize;
   }
 

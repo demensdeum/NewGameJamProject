@@ -13,7 +13,9 @@ export class SceneController {
 
     private canvas: HTMLCanvasElement;
 
-    public static readonly roadSegmentSize: number = 4;
+    public static readonly carSize: number = 1;
+    public static readonly roadSegmentSize: number = 2;
+    public static readonly skyboxPositionDiffX: number = 0.5;
 
     private scene: any;
     private camera: any;
@@ -118,7 +120,7 @@ export class SceneController {
             Identifiers.skyboxFront,
             0,
             0,
-            -0.5,
+            -SceneController.skyboxPositionDiffX,
             1,
             1,
             "data/background.png",
@@ -130,7 +132,7 @@ export class SceneController {
             Identifiers.skyboxLeft,
             0,
             0,
-            -0.5,
+            -SceneController.skyboxPositionDiffX,
             1,
             1,
             "data/background.png",
@@ -145,7 +147,7 @@ export class SceneController {
         )   
         this.moveObjectTo(
             Identifiers.skyboxLeft,
-            -0.5,
+            -SceneController.skyboxPositionDiffX,
             0,
             0
         )
@@ -154,7 +156,7 @@ export class SceneController {
             Identifiers.skyboxRight,
             0,
             0,
-            0.5,
+            SceneController.skyboxPositionDiffX,
             1,
             1,
             "data/background.png",
@@ -169,7 +171,7 @@ export class SceneController {
         )   
         this.moveObjectTo(
             Identifiers.skyboxRight,
-            0.5,
+            SceneController.skyboxPositionDiffX,
             0,
             0
         )        
@@ -185,8 +187,13 @@ export class SceneController {
     ): void {
         this.context.debugPrint("addCubeAt");
         const texture = this.loadTexture(texturePath);
+        const carSize = SceneController.carSize;
         // @ts-ignore
-        const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
+        const boxGeometry = new THREE.BoxGeometry(
+            carSize, 
+            carSize, 
+            carSize
+        );
         // @ts-ignore
         const boxMaterial = new THREE.MeshBasicMaterial({
              color: color,

@@ -28,13 +28,11 @@ var InputController = /** @class */ (function () {
         this.currentTouchX = this.touchStartX;
         this.currentTouchY = this.touchStartY;
         this.isTouching = true;
-        this.context.debugPrint("onMouseDown");
     };
     InputController.prototype.onMouseUp = function (event) {
         this.isTouching = false;
         this.touchStartX = 0;
         this.touchStartY = 0;
-        this.context.debugPrint("onMouseUp");
     };
     InputController.prototype.onMouseMove = function (event) {
         this.currentTouchX = event.x;
@@ -54,8 +52,6 @@ var InputController = /** @class */ (function () {
             var xLimit = this.canvas.width;
             var xAspect = (this.currentTouchX - this.touchStartX) / xLimit;
             xAspect = Math.min(xLimit, xAspect);
-            this.context.debugPrint("currentTouchX: " + this.currentTouchX);
-            this.context.debugPrint("touchStartX: " + this.touchStartX);
             var yAspect = this.currentTouchY / this.canvas.height;
             var mouseEvent = new GameInputMouseEvent([xAspect, yAspect]);
             this.delegate.inputControllerDidReceive(this, mouseEvent);

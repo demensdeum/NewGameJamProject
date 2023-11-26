@@ -6,11 +6,10 @@ import { ObjectsPool } from './objectsPool.js';
 import { ObjectsPoolItem } from './objectdsPoolItem.js';
 var InGameState = /** @class */ (function () {
     function InGameState(name, context, sceneController) {
-        this.roadSegmentsColumnsCount = 4;
+        this.roadSegmentsColumnsCount = 10;
         this.roadSegmentsRowsCount = 25;
-        this.itemsCount = 10;
+        this.itemsCount = 20;
         this.floorY = -2;
-        this.boxSize = 1;
         this.speedLimit = 0.4;
         this.name = name;
         this.objectsPool = new ObjectsPool();
@@ -24,29 +23,58 @@ var InGameState = /** @class */ (function () {
         this.sceneController.moveObjectTo(name, position.x, position.y, position.z);
     };
     ;
+    InGameState.prototype.leftBorderX = function () {
+        return -SceneController.roadSegmentSize / 2;
+    };
+    InGameState.prototype.rightBorderX = function () {
+        return this.roadSegmentsColumnsCount * SceneController.roadSegmentSize - SceneController.carSize;
+    };
+    InGameState.prototype.minimalCarX = function () {
+        return -SceneController.roadSegmentSize / 4;
+    };
+    InGameState.prototype.maximalCarX = function () {
+        return this.roadSegmentsColumnsCount * SceneController.roadSegmentSize - (SceneController.carSize + SceneController.carSize.half());
+    };
     InGameState.prototype.inputControllerDidReceive = function (inputController, inputEvent) {
-        var _a;
         if (inputEvent instanceof GameInputMouseEvent) {
             var value = inputEvent.value;
             var inputX = value[0];
             var xDiff = inputX;
-            (_a = this.context) === null || _a === void 0 ? void 0 : _a.debugPrint("xDiff:" + xDiff + "; y: " + value[1]);
-            this.moveObjectByDiffX("player car", xDiff);
-            this.moveObjectByDiffX("camera", xDiff);
-            this.moveObjectByDiffX(Identifiers.skyboxLeft, xDiff);
-            this.moveObjectByDiffX(Identifiers.skyboxFront, xDiff);
-            this.moveObjectByDiffX(Identifiers.skyboxRight, xDiff);
+            var position = this.sceneController.sceneObjectPosition(Identifiers.playerCar);
+            var newX = position.x + xDiff;
+            var carLeftPointX = (position.x + xDiff) - SceneController.carSize / 2;
+            var carRightPointX = (position.x + xDiff) + SceneController.carSize / 2;
+            if (xDiff < 0 && carLeftPointX < this.leftBorderX()) {
+                this.context.debugPrint("blocked L");
+                newX = this.minimalCarX();
+            }
+            if (xDiff > 0 && carRightPointX > this.rightBorderX()) {
+                this.context.debugPrint("blocked R");
+                newX = this.maximalCarX();
+            }
+            var leftSkyBoxX = newX - SceneController.skyboxPositionDiffX;
+            var rightSkyBoxX = newX + SceneController.skyboxPositionDiffX;
+            this.changeObjectX(Identifiers.playerCar, newX);
+            this.changeObjectX(Identifiers.camera, newX);
+            this.changeObjectX(Identifiers.skyboxLeft, leftSkyBoxX);
+            this.changeObjectX(Identifiers.skyboxFront, newX);
+            this.changeObjectX(Identifiers.skyboxRight, rightSkyBoxX);
         }
+    };
+    InGameState.prototype.changeObjectX = function (name, x) {
+        var position = this.sceneController.sceneObjectPosition(name);
+        position.x = x;
+        this.sceneController.moveObjectTo(name, position.x, position.y, position.z);
     };
     InGameState.prototype.initialize = function (context) {
         this.context = context;
         this.sceneController = context.sceneController;
         this.sceneController.addSkybox();
-        this.sceneController.addCarAt("player car", 0, this.floorY + this.boxSize * 0.5, -4);
+        this.sceneController.addCarAt(Identifiers.playerCar, 0, this.floorY + SceneController.carSize * 0.5, -4);
         for (var x = 0; x < this.roadSegmentsColumnsCount; x++) {
             for (var z = 0; z < this.roadSegmentsRowsCount; z++) {
                 var name_1 = this.roadSegmentName(x, z);
-                var roadSegmentX = x * SceneController.roadSegmentSize + InGameState.roadSegmentsXOffset;
+                var roadSegmentX = x * SceneController.roadSegmentSize;
                 var roadSegmentZ = -z * SceneController.roadSegmentSize;
                 this.sceneController.addRoadSegmentAt(name_1, roadSegmentX, this.floorY, roadSegmentZ);
             }
@@ -55,7 +83,7 @@ var InGameState = /** @class */ (function () {
         this.sceneController.addUI(context.gameData);
         for (var i = 0; i < this.itemsCount; i++) {
             var name_2 = this.itemName(i);
-            this.sceneController.addItemAt(name_2, 0, this.floorY + this.boxSize * 0.5, 0);
+            this.sceneController.addItemAt(name_2, 0, this.floorY + SceneController.carSize * 0.5, 0);
             this.randomizeItemStartPosition(this.itemName(i));
             var objectsPoolItem = new ObjectsPoolItem(name_2);
             this.objectsPool.push(objectsPoolItem);
@@ -64,7 +92,7 @@ var InGameState = /** @class */ (function () {
     };
     InGameState.prototype.randomizeItemStartPosition = function (name) {
         var position = this.sceneController.sceneObjectPosition(name);
-        position.x = Utils.randomInt(4) * SceneController.roadSegmentSize + InGameState.roadSegmentsXOffset;
+        position.x = Utils.randomInt(this.roadSegmentsColumnsCount) * SceneController.roadSegmentSize;
         position.z = this.horizonDotZ() + Utils.randomInt(this.roadSegmentsRowsCount) * SceneController.roadSegmentSize;
     };
     InGameState.prototype.updateUI = function () {
@@ -121,7 +149,6 @@ var InGameState = /** @class */ (function () {
             }
         }
     };
-    InGameState.roadSegmentsXOffset = -(SceneController.roadSegmentSize + SceneController.roadSegmentSize / 2);
     return InGameState;
 }());
 export { InGameState };

@@ -70,20 +70,21 @@ var SceneController = /** @class */ (function () {
         }
     };
     SceneController.prototype.addSkybox = function () {
-        this.addPlaneAt(Identifiers.skyboxFront, 0, 0, -0.5, 1, 1, "data/background.png", 0x0000FF, true);
-        this.addPlaneAt(Identifiers.skyboxLeft, 0, 0, -0.5, 1, 1, "data/background.png", 0x00FFFF, true);
+        this.addPlaneAt(Identifiers.skyboxFront, 0, 0, -SceneController.skyboxPositionDiffX, 1, 1, "data/background.png", 0x0000FF, true);
+        this.addPlaneAt(Identifiers.skyboxLeft, 0, 0, -SceneController.skyboxPositionDiffX, 1, 1, "data/background.png", 0x00FFFF, true);
         this.rotateObject(Identifiers.skyboxLeft, 0, Utils.angleToRadians(90), 0);
-        this.moveObjectTo(Identifiers.skyboxLeft, -0.5, 0, 0);
-        this.addPlaneAt(Identifiers.skyboxRight, 0, 0, 0.5, 1, 1, "data/background.png", 0xFF00FF, true);
+        this.moveObjectTo(Identifiers.skyboxLeft, -SceneController.skyboxPositionDiffX, 0, 0);
+        this.addPlaneAt(Identifiers.skyboxRight, 0, 0, SceneController.skyboxPositionDiffX, 1, 1, "data/background.png", 0xFF00FF, true);
         this.rotateObject(Identifiers.skyboxRight, 0, Utils.angleToRadians(90), 0);
-        this.moveObjectTo(Identifiers.skyboxRight, 0.5, 0, 0);
+        this.moveObjectTo(Identifiers.skyboxRight, SceneController.skyboxPositionDiffX, 0, 0);
     };
     SceneController.prototype.addBoxAt = function (name, x, y, z, texturePath, color) {
         if (color === void 0) { color = 0x00FFFF; }
         this.context.debugPrint("addCubeAt");
         var texture = this.loadTexture(texturePath);
+        var carSize = SceneController.carSize;
         // @ts-ignore
-        var boxGeometry = new THREE.BoxGeometry(1, 1, 1);
+        var boxGeometry = new THREE.BoxGeometry(carSize, carSize, carSize);
         // @ts-ignore
         var boxMaterial = new THREE.MeshBasicMaterial({
             color: color,
@@ -160,7 +161,9 @@ var SceneController = /** @class */ (function () {
         sceneObject.threeObject.rotation.y = y;
         sceneObject.threeObject.rotation.z = z;
     };
-    SceneController.roadSegmentSize = 4;
+    SceneController.carSize = 1;
+    SceneController.roadSegmentSize = 2;
+    SceneController.skyboxPositionDiffX = 0.5;
     return SceneController;
 }());
 export { SceneController };
