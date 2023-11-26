@@ -15,7 +15,7 @@ import { SceneObjectIdentifier, SceneObjectIdentifier as SceneObjectName } from 
 
 export class InGameState implements State, InputControllerDelegate {
   
-  private readonly roadSegmentsColumnsCount: number = 10;
+  private readonly roadSegmentsColumnsCount: number = 3;
   private readonly roadSegmentsRowsCount: number = 25;
   private readonly itemsCount: number = 20;
   private readonly floorY: number = -2;
@@ -58,7 +58,7 @@ export class InGameState implements State, InputControllerDelegate {
   };
 
   private leftBorderX() {
-    return -SceneController.roadSegmentSize / 2;
+    return -SceneController.roadSegmentSize.half();
   }
 
   private rightBorderX() {
@@ -82,8 +82,8 @@ export class InGameState implements State, InputControllerDelegate {
         const xDiff = inputX;
         const position = this.sceneController.sceneObjectPosition(Identifiers.playerCar);
         var newX = position.x + xDiff;
-        const carLeftPointX = (position.x + xDiff) - SceneController.carSize / 2;
-        const carRightPointX = (position.x + xDiff) + SceneController.carSize / 2;
+        const carLeftPointX = (position.x + xDiff) - SceneController.carSize.half();
+        const carRightPointX = (position.x + xDiff) + SceneController.carSize.half();
         if (xDiff < 0 && carLeftPointX < this.leftBorderX()) {
           this.context.debugPrint("blocked L");
           newX = this.minimalCarX();
@@ -126,7 +126,7 @@ export class InGameState implements State, InputControllerDelegate {
     this.sceneController.addCarAt(
       Identifiers.playerCar,
       0, 
-      this.floorY + SceneController.carSize * 0.5, 
+      this.floorY + SceneController.carSize.half(), 
       -4
     );
 
@@ -156,7 +156,7 @@ export class InGameState implements State, InputControllerDelegate {
       this.sceneController.addItemAt(
         name,
         0,
-        this.floorY + SceneController.carSize * 0.5,
+        this.floorY + SceneController.carSize.half(),
         0
       );
 

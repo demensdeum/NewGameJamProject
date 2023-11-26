@@ -21,24 +21,28 @@ def process_files_in_folder(input_folder, output_folder, rules):
             input_file = os.path.join(input_folder, filename)
             output_file = os.path.join(output_folder, filename)
             process_file(input_file, output_file, rules)
-            print(f"Файл {filename} обработан и сохранен в {output_folder}.")
+            print(f"File {filename} processed and saved in {output_folder}.")
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Использование: python script.py /путь/к/исходной/папке /путь/к/выходной/папке")
+    if len(sys.argv) != 4:
+        print("Usage: python script.py /path/to/input/folder /path/to/output/folder /path/to/rules.json")
         sys.exit(1)
 
     input_folder = sys.argv[1]
     output_folder = sys.argv[2]
+    rules_file_path = sys.argv[3]
 
     if not os.path.exists(input_folder):
-        print(f"Указанная папка {input_folder} не существует.")
+        print(f"The specified folder {input_folder} does not exist.")
         sys.exit(1)
 
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
 
-    rules_file_path = 'rules.json'  # Путь к файлу с правилами
+    if not os.path.exists(rules_file_path):
+        print(f"The specified rules file {rules_file_path} does not exist.")
+        sys.exit(1)
+
     rules = load_rules(rules_file_path)
 
     process_files_in_folder(input_folder, output_folder, rules)

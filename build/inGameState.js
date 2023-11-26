@@ -6,7 +6,7 @@ import { ObjectsPool } from './objectsPool.js';
 import { ObjectsPoolItem } from './objectdsPoolItem.js';
 var InGameState = /** @class */ (function () {
     function InGameState(name, context, sceneController) {
-        this.roadSegmentsColumnsCount = 10;
+        this.roadSegmentsColumnsCount = 3;
         this.roadSegmentsRowsCount = 25;
         this.itemsCount = 20;
         this.floorY = -2;
@@ -24,7 +24,7 @@ var InGameState = /** @class */ (function () {
     };
     ;
     InGameState.prototype.leftBorderX = function () {
-        return -SceneController.roadSegmentSize / 2;
+        return -SceneController.roadSegmentSize * 0.5;
     };
     InGameState.prototype.rightBorderX = function () {
         return this.roadSegmentsColumnsCount * SceneController.roadSegmentSize - SceneController.carSize;
@@ -33,7 +33,7 @@ var InGameState = /** @class */ (function () {
         return -SceneController.roadSegmentSize / 4;
     };
     InGameState.prototype.maximalCarX = function () {
-        return this.roadSegmentsColumnsCount * SceneController.roadSegmentSize - (SceneController.carSize + SceneController.carSize.half());
+        return this.roadSegmentsColumnsCount * SceneController.roadSegmentSize - (SceneController.carSize + SceneController.carSize * 0.5);
     };
     InGameState.prototype.inputControllerDidReceive = function (inputController, inputEvent) {
         if (inputEvent instanceof GameInputMouseEvent) {
@@ -42,8 +42,8 @@ var InGameState = /** @class */ (function () {
             var xDiff = inputX;
             var position = this.sceneController.sceneObjectPosition(Identifiers.playerCar);
             var newX = position.x + xDiff;
-            var carLeftPointX = (position.x + xDiff) - SceneController.carSize / 2;
-            var carRightPointX = (position.x + xDiff) + SceneController.carSize / 2;
+            var carLeftPointX = (position.x + xDiff) - SceneController.carSize * 0.5;
+            var carRightPointX = (position.x + xDiff) + SceneController.carSize * 0.5;
             if (xDiff < 0 && carLeftPointX < this.leftBorderX()) {
                 this.context.debugPrint("blocked L");
                 newX = this.minimalCarX();
