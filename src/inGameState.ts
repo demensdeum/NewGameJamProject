@@ -15,15 +15,14 @@ import { SceneObjectIdentifier, SceneObjectIdentifier as SceneObjectName } from 
 
 export class InGameState implements State, InputControllerDelegate {
   
-  private readonly roadSegmentsColumnsCount: number = 2;
+  private readonly roadSegmentsColumnsCount: number = 3;
   private readonly roadSegmentsRowsCount: number = 10;
   private readonly itemsCount: number = this.roadSegmentsRowsCount * 2;
   private readonly floorY: number = -2;
 
-  private freeSlotsZ: number[] = [];
-  private itemToSlotZ: { [key: string]: number } = {};
+  private isItemOnRespawnRow: string = "";
 
-  private speedLimit: number = 0.1;
+  private speedLimit: number = 0.2;
   private objectsPool: ObjectsPool<SceneObjectName>;
 
   public name: string;
@@ -37,10 +36,6 @@ export class InGameState implements State, InputControllerDelegate {
     context: Context,
     sceneController: SceneController
   ) {
-    for (var i = 0; i < this.roadSegmentsRowsCount; i++) {
-      this.freeSlotsZ.push(i);
-    }
-    this.freeSlotsZ = Utils.shuffle(this.freeSlotsZ);
     this.name = name;
     this.objectsPool = new ObjectsPool<SceneObjectName>();    
     this.context = context;
@@ -153,7 +148,7 @@ export class InGameState implements State, InputControllerDelegate {
     this.sceneController.moveObjectTo(
       Names.camera, 
       0, 
-      20, 
+      12, 
       -10
     );
     this.sceneController.rotateObject(
@@ -174,28 +169,34 @@ export class InGameState implements State, InputControllerDelegate {
       );
 
       this.randomizeItemStartPosition(this.itemName(i));
-
-      const objectsPoolItem = new ObjectsPoolItem<SceneObjectName>(
-        name
-      );
-      this.objectsPool.push(objectsPoolItem);
     }
 
     context.debugPrint("In Game State Initialized");
   }
 
   private randomizeItemStartPosition(name: SceneObjectIdentifier) {
-    const position = this.sceneController.sceneObjectPosition(name);
-    position.x = Utils.randomInt(this.roadSegmentsColumnsCount) * SceneController.roadSegmentSize;
+    // const position = this.sceneController.sceneObjectPosition(name);
+    // position.x = Utils.randomInt(this.roadSegmentsColumnsCount) * SceneController.roadSegmentSize;
 
-    var maybeSlotZ: number | null = this.freeSlotsZ.pop() ?? null;
-    if (maybeSlotZ == null) {
-      this.context.debugPrint("No FREE SLOTS!! WAIT PLEASE!!!");
-      return;
+    // var maybeSlotZ: number | null = this.freeSlotsZ.pop() ?? null;
+    // if (maybeSlotZ == null) {
+    //   this.context.debugPrint("No FREE SLOTS!! WAIT PLEASE!!!");
+    //   return;
+    // }
+    // const zSlot = maybeSlotZ!;
+    // this.itemToSlotZ[name] = zSlot;
+    // position.z = Math.floor(this.horizonDotZ() - zSlot * SceneController.roadSegmentSize);
+
+    const position = this.sceneController.sceneObjectPosition(name);
+    if (this.isItemOnRespawnRow == "") {
+      position.x = Utils.randomInt(this.roadSegmentsColumnsCount) * SceneController.roadSegmentSize;
+      position.z = Math.floor(this.horizonDotZ());
+      this.context.debugPrint("SET ITEM AS COOLEST GUY ON THE BLOCK!!!");
+      this.isItemOnRespawnRow = name;
     }
-    const zSlot = maybeSlotZ!;
-    this.itemToSlotZ[name] = zSlot;
-    position.z = Math.floor(this.horizonDotZ() - zSlot * SceneController.roadSegmentSize);
+    else {
+      this.context.debugPrint("CUBE IS ON RESPAWN ROW!! WAIT!!!");
+    }
   }
 
   private updateUI(): void {
@@ -213,6 +214,7 @@ export class InGameState implements State, InputControllerDelegate {
     this.spawnObjects();
     this.collide();
     this.updateUI();
+    this.context.debugPrint("eh: " + this.isItemOnRespawnRow);    
   }
 
   private increaseSpeed() {
@@ -230,19 +232,18 @@ export class InGameState implements State, InputControllerDelegate {
   }
 
   private moveItems() {
+    this.isItemOnRespawnRow = "";
+
     for (var i=0; i < this.itemsCount ; i++) {
       const itemName = this.itemName(i);
       const itemPosition = this.sceneController.sceneObjectPosition(itemName);
       itemPosition.z += this.gameData.speed;
 
       if (itemPosition.z > SceneController.roadSegmentSize) {
-        //itemPosition.z -=  this.horizonDotZ();
-        const zSlot = this.itemToSlotZ[itemName];
-        
-        this.freeSlotsZ.push(zSlot);
-        delete this.itemToSlotZ[itemName];
-
         this.randomizeItemStartPosition(itemName)
+      }
+      else if (itemPosition.z < this.horizonDotZ() + SceneController.roadSegmentSize) {
+        this.isItemOnRespawnRow = itemName;
       }
     }
   }
