@@ -156,7 +156,7 @@ export class SceneController {
             1,
             1,
             "./assets/skyboxFrontTexture.png",
-            0x0000FF,
+            0xFFFFFF,
             true
         )
 
@@ -168,7 +168,7 @@ export class SceneController {
             1,
             1,
             "./assets/skyboxLeftTexture.png",
-            0x00FFFF,
+            0xFFFFFF,
             true
         )
         this.rotateObject(
@@ -192,7 +192,7 @@ export class SceneController {
             1,
             1,
             "./assets/skyboxRightTexture.png",
-            0xFF00FF,
+            0xFFFFFF,
             true
         )
         this.rotateObject(
@@ -340,7 +340,7 @@ export class SceneController {
             x,
             y,
             z,
-            "./assets/skyboxLeftTexture.png",
+            "./assets/carTexture.png",
             SceneController.carSize
         )
     }

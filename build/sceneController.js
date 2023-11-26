@@ -86,11 +86,11 @@ export class SceneController {
         }
     }
     addSkybox() {
-        this.addPlaneAt(Names.skyboxFront, 0, 0, -SceneController.skyboxPositionDiffX, 1, 1, "./assets/skyboxFrontTexture.png", 0x0000FF, true);
-        this.addPlaneAt(Names.skyboxLeft, 0, 0, -SceneController.skyboxPositionDiffX, 1, 1, "./assets/skyboxLeftTexture.png", 0x00FFFF, true);
+        this.addPlaneAt(Names.skyboxFront, 0, 0, -SceneController.skyboxPositionDiffX, 1, 1, "./assets/skyboxFrontTexture.png", 0xFFFFFF, true);
+        this.addPlaneAt(Names.skyboxLeft, 0, 0, -SceneController.skyboxPositionDiffX, 1, 1, "./assets/skyboxLeftTexture.png", 0xFFFFFF, true);
         this.rotateObject(Names.skyboxLeft, 0, Utils.angleToRadians(90), 0);
         this.moveObjectTo(Names.skyboxLeft, -SceneController.skyboxPositionDiffX, 0, 0);
-        this.addPlaneAt(Names.skyboxRight, 0, 0, SceneController.skyboxPositionDiffX, 1, 1, "./assets/skyboxRightTexture.png", 0xFF00FF, true);
+        this.addPlaneAt(Names.skyboxRight, 0, 0, SceneController.skyboxPositionDiffX, 1, 1, "./assets/skyboxRightTexture.png", 0xFFFFFF, true);
         this.rotateObject(Names.skyboxRight, 0, Utils.angleToRadians(90), 0);
         this.moveObjectTo(Names.skyboxRight, SceneController.skyboxPositionDiffX, 0, 0);
     }
@@ -169,7 +169,7 @@ export class SceneController {
     }
     addCarAt(name, x, y, z) {
         this.context.debugPrint("addCarAt");
-        this.addBoxAt(name, x, y, z, "./assets/skyboxLeftTexture.png", SceneController.carSize);
+        this.addBoxAt(name, x, y, z, "./assets/carTexture.png", SceneController.carSize);
     }
     addRoadSegmentAt(name, x, y, z) {
         this.context.debugPrint("addRoadSegmentAt");
