@@ -6,11 +6,15 @@ import { Names } from "./names.js";
 const gui = new dat.GUI();
 export class SceneController {
     constructor(context, canvas) {
+        this.texturesToLoad = [];
+        // @ts-ignore
+        this.textureLoader = new THREE.TextureLoader();
         this.context = context;
         this.canvas = canvas;
         // @ts-ignore
-        this.textureLoader = new THREE.TextureLoader();
-        this.failbackTexture = this.textureLoader.load("./assets/failbackTexture.png");
+        this.failbackTexture = this.textureLoader.load("./assets/failbackTexture.png", () => {
+            console.log("UHHHHHHHHH");
+        });
         this.loadingTexture = this.textureLoader.load("./assets/loadingTexture.png");
         // @ts-ignore
         this.scene = new THREE.Scene();
@@ -42,13 +46,20 @@ export class SceneController {
     step() {
         this.renderer.render(this.scene, this.camera);
     }
-    loadTexture(path, successCallback, errorCallback) {
-        const texture = this.textureLoader.load(path, () => {
-            successCallback();
-        }, () => {
-            return this.failbackTexture;
+    loadTexture(path, material) {
+        const context = this.context;
+        this.textureLoader.load(path, 
+        // @ts-ignore
+        function (texture) {
+            console.log("aaaa");
+            material.texture = texture;
+            material.needsUpdate = true;
+        }, 
+        // @ts-ignore
+        function (error) {
+            console.log("error");
+            context.debugPrint("CANNOT LOAD TEXTURE: " + path);
         });
-        return this.loadingTexture;
     }
     addSceneObject(object) {
         // @ts-ignore
@@ -75,26 +86,35 @@ export class SceneController {
         }
     }
     addSkybox() {
-        this.addPlaneAt(Names.skyboxFront, 0, 0, -SceneController.skyboxPositionDiffX, 1, 1, "./assets/background.png", 0x0000FF, true);
-        this.addPlaneAt(Names.skyboxLeft, 0, 0, -SceneController.skyboxPositionDiffX, 1, 1, "./assets/background.png", 0x00FFFF, true);
+        this.addPlaneAt(Names.skyboxFront, 0, 0, -SceneController.skyboxPositionDiffX, 1, 1, "./assets/skyboxFrontTexture.png", 0x0000FF, true);
+        this.addPlaneAt(Names.skyboxLeft, 0, 0, -SceneController.skyboxPositionDiffX, 1, 1, "./assets/skyboxLeftTexture.png", 0x00FFFF, true);
         this.rotateObject(Names.skyboxLeft, 0, Utils.angleToRadians(90), 0);
         this.moveObjectTo(Names.skyboxLeft, -SceneController.skyboxPositionDiffX, 0, 0);
-        this.addPlaneAt(Names.skyboxRight, 0, 0, SceneController.skyboxPositionDiffX, 1, 1, "./assets/background.png", 0xFF00FF, true);
+        this.addPlaneAt(Names.skyboxRight, 0, 0, SceneController.skyboxPositionDiffX, 1, 1, "./assets/skyboxRightTexture.png", 0xFF00FF, true);
         this.rotateObject(Names.skyboxRight, 0, Utils.angleToRadians(90), 0);
         this.moveObjectTo(Names.skyboxRight, SceneController.skyboxPositionDiffX, 0, 0);
     }
     addBoxAt(name, x, y, z, texturePath, size, color = 0x00FFFF) {
         this.context.debugPrint("addCubeAt");
-        const texture = this.loadTexture(texturePath, () => { }, () => { });
         // @ts-ignore
         const boxGeometry = new THREE.BoxGeometry(size, size, size);
         // @ts-ignore
-        const boxMaterial = new THREE.MeshBasicMaterial({
+        const material = new THREE.MeshBasicMaterial({
             color: color,
-            map: texture
+            map: this.loadingTexture
         });
+        const newMaterial = new THREE.MeshBasicMaterial({
+            color: color,
+            map: this.textureLoader.load(texturePath, (texture) => {
+                material.map = texture;
+                material.needsUpdate;
+            }, (error) => {
+                console.log("WUT!!!!");
+            })
+        });
+        this.texturesToLoad.push(newMaterial);
         // @ts-ignore
-        const box = new THREE.Mesh(boxGeometry, boxMaterial);
+        const box = new THREE.Mesh(boxGeometry, material);
         box.position.x = x;
         box.position.y = y;
         box.position.z = z;
@@ -105,21 +125,43 @@ export class SceneController {
         this.context.debugPrint("addPlaneAt");
         // @ts-ignore
         const planeGeometry = new THREE.PlaneGeometry(width, height);
-        const texture = this.loadTexture(texturePath, () => { }, () => { });
         // @ts-ignore
-        const planeMaterial = new THREE.MeshBasicMaterial({
-            // @ts-ignore
+        const material = new THREE.MeshBasicMaterial({
             color: color,
+            map: this.loadingTexture,
+            // @ts-ignore
             depthWrite: !resetDepthBuffer,
-            map: texture,
             // @ts-ignore
             side: THREE.DoubleSide,
         });
         // @ts-ignore
-        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        const newMaterial = new THREE.MeshBasicMaterial({
+            color: color,
+            map: this.textureLoader.load(texturePath, 
+            // @ts-ignore
+            (texture) => {
+                material.map = texture;
+                material.needsUpdate = true;
+            }, 
+            // @ts-ignore
+            (error) => {
+                console.log("WUT!");
+            }),
+            // @ts-ignore
+            depthWrite: !resetDepthBuffer,
+            // @ts-ignore
+            side: THREE.DoubleSide,
+        });
+        this.texturesToLoad.push(newMaterial);
+        // @ts-ignore
+        const plane = new THREE.Mesh(planeGeometry, material);
         plane.position.x = x;
         plane.position.y = y;
         plane.position.z = z;
+        // this.loadTexture(
+        //     texturePath, 
+        //     material
+        // );        
         // @ts-ignore
         const box = new THREE.Box3().setFromObject(plane);
         const sceneObject = new SceneObject(name, plane);
@@ -127,7 +169,7 @@ export class SceneController {
     }
     addCarAt(name, x, y, z) {
         this.context.debugPrint("addCarAt");
-        this.addBoxAt(name, x, y, z, "./assets/carTexture.png", SceneController.carSize);
+        this.addBoxAt(name, x, y, z, "./assets/skyboxLeftTexture.png", SceneController.carSize);
     }
     addRoadSegmentAt(name, x, y, z) {
         this.context.debugPrint("addRoadSegmentAt");

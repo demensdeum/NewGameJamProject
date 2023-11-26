@@ -18,10 +18,13 @@ export class SceneController {
     public static readonly roadSegmentSize: number = 2;
     public static readonly skyboxPositionDiffX: number = 0.5;
 
+    // @ts-ignore
     private scene: any;
     private camera: any;
     private renderer: any;
-    private textureLoader: any;
+    private texturesToLoad: any[] = [];
+    // @ts-ignore
+    private textureLoader: any = new THREE.TextureLoader();
 
     private context: Context;
     private objects: [SceneObject];
@@ -36,10 +39,11 @@ export class SceneController {
         this.context = context;
         this.canvas = canvas;
 // @ts-ignore
-        this.textureLoader = new THREE.TextureLoader();
-
         this.failbackTexture = this.textureLoader.load(
-            "./assets/failbackTexture.png"
+            "./assets/failbackTexture.png",
+            ()=>{
+                console.log("UHHHHHHHHH");
+            }
         );
 
         this.loadingTexture = this.textureLoader.load(
@@ -95,19 +99,23 @@ export class SceneController {
 
     public loadTexture(
         path: string,
-        successCallback: () => void,
-        errorCallback: () => void
+        material: any
     ): any {
-        const texture = this.textureLoader.load(
+        const context = this.context;
+        this.textureLoader.load(
             path,
-            () => {
-                successCallback();
+            // @ts-ignore
+            function (texture) {
+                console.log("aaaa");
+                material.texture = texture;
+                material.needsUpdate = true;
             },
-            () => {
-                return this.failbackTexture;
+            // @ts-ignore
+            function (error) {
+                console.log("error");
+                context.debugPrint("CANNOT LOAD TEXTURE: " + path);             
             }
-        );
-        return this.loadingTexture;
+        )
     }
 
     private addSceneObject(object: SceneObject): void {
@@ -147,7 +155,7 @@ export class SceneController {
             -SceneController.skyboxPositionDiffX,
             1,
             1,
-            "./assets/background.png",
+            "./assets/skyboxFrontTexture.png",
             0x0000FF,
             true
         )
@@ -159,7 +167,7 @@ export class SceneController {
             -SceneController.skyboxPositionDiffX,
             1,
             1,
-            "./assets/background.png",
+            "./assets/skyboxLeftTexture.png",
             0x00FFFF,
             true
         )
@@ -183,7 +191,7 @@ export class SceneController {
             SceneController.skyboxPositionDiffX,
             1,
             1,
-            "./assets/background.png",
+            "./assets/skyboxRightTexture.png",
             0xFF00FF,
             true
         )
@@ -211,7 +219,6 @@ export class SceneController {
         color: number = 0x00FFFF
     ): void {
         this.context.debugPrint("addCubeAt");
-        const texture = this.loadTexture(texturePath, ()=>{},()=>{});
         // @ts-ignore
         const boxGeometry = new THREE.BoxGeometry(
             size, 
@@ -219,15 +226,33 @@ export class SceneController {
             size
         );
         // @ts-ignore
-        const boxMaterial = new THREE.MeshBasicMaterial({
+        const material = new THREE.MeshBasicMaterial({
              color: color,
-             map: texture
+             map: this.loadingTexture
         });
+
+        const newMaterial = new THREE.MeshBasicMaterial({
+            color: color,
+            map: this.textureLoader.load(
+                texturePath,
+                (texture)=>{
+                    material.map = texture;
+                    material.needsUpdate;
+                },
+                (error)=>{
+                    console.log("WUT!!!!");
+                }
+            )
+       });        
+       this.texturesToLoad.push(newMaterial);
+
         // @ts-ignore
-        const box = new THREE.Mesh(boxGeometry, boxMaterial);
+        const box = new THREE.Mesh(boxGeometry, material);
         box.position.x = x;
         box.position.y = y;
         box.position.z = z;
+
+             
 
         const sceneObject = new SceneObject(
             name,
@@ -251,22 +276,47 @@ export class SceneController {
         // @ts-ignore
         const planeGeometry = new THREE.PlaneGeometry(width, height);
 
-        const texture = this.loadTexture(texturePath, ()=>{}, ()=>{});
-
         // @ts-ignore
-        const planeMaterial = new THREE.MeshBasicMaterial({
-            // @ts-ignore
+        const material = new THREE.MeshBasicMaterial({
             color: color,
-            depthWrite: !resetDepthBuffer,        
-            map: texture,
+            map: this.loadingTexture,
+            // @ts-ignore
+            depthWrite: !resetDepthBuffer,
             // @ts-ignore
             side: THREE.DoubleSide,
         });
+
         // @ts-ignore
-        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        const newMaterial = new THREE.MeshBasicMaterial({
+            color: color,
+            map: this.textureLoader.load(
+                texturePath,
+                // @ts-ignore
+                (texture)=>{
+                    material.map = texture;
+                    material.needsUpdate = true;
+                },
+                // @ts-ignore
+                (error)=>{
+                    console.log("WUT!");
+                }),
+                // @ts-ignore
+            depthWrite: !resetDepthBuffer,
+            // @ts-ignore
+            side: THREE.DoubleSide,
+        });
+        this.texturesToLoad.push(newMaterial);        
+
+        // @ts-ignore
+        const plane = new THREE.Mesh(planeGeometry, material);
         plane.position.x = x;
         plane.position.y = y;
         plane.position.z = z;
+
+        // this.loadTexture(
+        //     texturePath, 
+        //     material
+        // );        
 
         // @ts-ignore
         const box = new THREE.Box3().setFromObject(plane);
@@ -290,7 +340,7 @@ export class SceneController {
             x,
             y,
             z,
-            "./assets/carTexture.png",
+            "./assets/skyboxLeftTexture.png",
             SceneController.carSize
         )
     }
