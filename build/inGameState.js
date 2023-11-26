@@ -6,11 +6,17 @@ import { ObjectsPool } from './objectsPool.js';
 import { ObjectsPoolItem } from './objectdsPoolItem.js';
 export class InGameState {
     constructor(name, context, sceneController) {
-        this.roadSegmentsColumnsCount = 3;
-        this.roadSegmentsRowsCount = 25;
-        this.itemsCount = 20;
+        this.roadSegmentsColumnsCount = 2;
+        this.roadSegmentsRowsCount = 10;
+        this.itemsCount = this.roadSegmentsRowsCount * 2;
         this.floorY = -2;
-        this.speedLimit = 0.05;
+        this.freeSlotsZ = [];
+        this.itemToSlotZ = {};
+        this.speedLimit = 0.1;
+        for (var i = 0; i < this.roadSegmentsRowsCount; i++) {
+            this.freeSlotsZ.push(i);
+        }
+        this.freeSlotsZ = Utils.shuffle(this.freeSlotsZ);
         this.name = name;
         this.objectsPool = new ObjectsPool();
         this.context = context;
@@ -79,7 +85,8 @@ export class InGameState {
                 this.sceneController.addRoadSegmentAt(name, roadSegmentX, this.floorY, roadSegmentZ);
             }
         }
-        this.sceneController.moveObjectTo("camera", 0, 0, 0);
+        this.sceneController.moveObjectTo(Names.camera, 0, 20, -10);
+        this.sceneController.rotateObject(Names.camera, Utils.angleToRadians(-80), 0, 0);
         this.sceneController.addUI(context.gameData);
         for (var i = 0; i < this.itemsCount; i++) {
             const name = this.itemName(i);
@@ -91,9 +98,17 @@ export class InGameState {
         context.debugPrint("In Game State Initialized");
     }
     randomizeItemStartPosition(name) {
+        var _a;
         const position = this.sceneController.sceneObjectPosition(name);
         position.x = Utils.randomInt(this.roadSegmentsColumnsCount) * SceneController.roadSegmentSize;
-        position.z = this.horizonDotZ() + Utils.randomInt(this.roadSegmentsRowsCount) * SceneController.roadSegmentSize;
+        var maybeSlotZ = (_a = this.freeSlotsZ.pop()) !== null && _a !== void 0 ? _a : null;
+        if (maybeSlotZ == null) {
+            this.context.debugPrint("No FREE SLOTS!! WAIT PLEASE!!!");
+            return;
+        }
+        const zSlot = maybeSlotZ;
+        this.itemToSlotZ[name] = zSlot;
+        position.z = Math.floor(this.horizonDotZ() - zSlot * SceneController.roadSegmentSize);
     }
     updateUI() {
         this.sceneController.updateUI();
@@ -118,14 +133,19 @@ export class InGameState {
         return "item-" + i;
     }
     horizonDotZ() {
-        return SceneController.roadSegmentSize * this.roadSegmentsRowsCount;
+        return -SceneController.roadSegmentSize * this.roadSegmentsRowsCount;
     }
     moveItems() {
         for (var i = 0; i < this.itemsCount; i++) {
-            const itemPosition = this.sceneController.sceneObjectPosition(this.itemName(i));
+            const itemName = this.itemName(i);
+            const itemPosition = this.sceneController.sceneObjectPosition(itemName);
             itemPosition.z += this.gameData.speed;
             if (itemPosition.z > SceneController.roadSegmentSize) {
-                itemPosition.z -= this.horizonDotZ();
+                //itemPosition.z -=  this.horizonDotZ();
+                const zSlot = this.itemToSlotZ[itemName];
+                this.freeSlotsZ.push(zSlot);
+                delete this.itemToSlotZ[itemName];
+                this.randomizeItemStartPosition(itemName);
             }
         }
     }
@@ -143,7 +163,7 @@ export class InGameState {
                 const roadSegmentPosition = this.sceneController.sceneObjectPosition(roadSegmentName);
                 roadSegmentPosition.z += this.context.gameData.speed;
                 if (roadSegmentPosition.z > SceneController.roadSegmentSize) {
-                    roadSegmentPosition.z -= SceneController.roadSegmentSize * this.roadSegmentsRowsCount;
+                    roadSegmentPosition.z += this.horizonDotZ();
                 }
                 this.sceneController.moveObjectTo(roadSegmentName, roadSegmentPosition.x, roadSegmentPosition.y, roadSegmentPosition.z);
             }

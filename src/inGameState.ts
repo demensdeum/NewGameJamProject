@@ -6,7 +6,7 @@ import { InputControllerDelegate } from './inputControllerDelegate';
 import { GameInputEvent } from './gameInputEvent';
 import { InputController } from './inputController';
 import { GameInputMouseEvent } from './gameInputMouseEvent.js';
-import { Identifiers as Names } from './names.js';
+import { Identifiers, Identifiers as Names } from './names.js';
 import { GameData } from './gameData.js';
 import { ObjectsPool } from './objectsPool.js'
 import { SceneObject } from './sceneObject';
@@ -15,12 +15,15 @@ import { SceneObjectIdentifier, SceneObjectIdentifier as SceneObjectName } from 
 
 export class InGameState implements State, InputControllerDelegate {
   
-  private readonly roadSegmentsColumnsCount: number = 3;
-  private readonly roadSegmentsRowsCount: number = 25;
-  private readonly itemsCount: number = 20;
+  private readonly roadSegmentsColumnsCount: number = 2;
+  private readonly roadSegmentsRowsCount: number = 10;
+  private readonly itemsCount: number = this.roadSegmentsRowsCount * 2;
   private readonly floorY: number = -2;
 
-  private speedLimit: number = 0.05;
+  private freeSlotsZ: number[] = [];
+  private itemToSlotZ: { [key: string]: number } = {};
+
+  private speedLimit: number = 0.1;
   private objectsPool: ObjectsPool<SceneObjectName>;
 
   public name: string;
@@ -34,6 +37,10 @@ export class InGameState implements State, InputControllerDelegate {
     context: Context,
     sceneController: SceneController
   ) {
+    for (var i = 0; i < this.roadSegmentsRowsCount; i++) {
+      this.freeSlotsZ.push(i);
+    }
+    this.freeSlotsZ = Utils.shuffle(this.freeSlotsZ);
     this.name = name;
     this.objectsPool = new ObjectsPool<SceneObjectName>();    
     this.context = context;
@@ -144,11 +151,17 @@ export class InGameState implements State, InputControllerDelegate {
       }
     }
     this.sceneController.moveObjectTo(
-      "camera", 
+      Names.camera, 
       0, 
-      0, 
-      0
+      20, 
+      -10
     );
+    this.sceneController.rotateObject(
+      Names.camera,
+      Utils.angleToRadians(-80),
+      0,
+      0
+    )
     this.sceneController.addUI(context.gameData);
 
     for (var i = 0; i < this.itemsCount; i++) {
@@ -174,7 +187,15 @@ export class InGameState implements State, InputControllerDelegate {
   private randomizeItemStartPosition(name: SceneObjectIdentifier) {
     const position = this.sceneController.sceneObjectPosition(name);
     position.x = Utils.randomInt(this.roadSegmentsColumnsCount) * SceneController.roadSegmentSize;
-    position.z = this.horizonDotZ() + Utils.randomInt(this.roadSegmentsRowsCount) * SceneController.roadSegmentSize;
+
+    var maybeSlotZ: number | null = this.freeSlotsZ.pop() ?? null;
+    if (maybeSlotZ == null) {
+      this.context.debugPrint("No FREE SLOTS!! WAIT PLEASE!!!");
+      return;
+    }
+    const zSlot = maybeSlotZ!;
+    this.itemToSlotZ[name] = zSlot;
+    position.z = Math.floor(this.horizonDotZ() - zSlot * SceneController.roadSegmentSize);
   }
 
   private updateUI(): void {
@@ -205,16 +226,23 @@ export class InGameState implements State, InputControllerDelegate {
   }
 
   private horizonDotZ() {
-    return SceneController.roadSegmentSize * this.roadSegmentsRowsCount
+    return -SceneController.roadSegmentSize * this.roadSegmentsRowsCount
   }
 
   private moveItems() {
     for (var i=0; i < this.itemsCount ; i++) {
-      const itemPosition = this.sceneController.sceneObjectPosition(this.itemName(i));
+      const itemName = this.itemName(i);
+      const itemPosition = this.sceneController.sceneObjectPosition(itemName);
       itemPosition.z += this.gameData.speed;
 
       if (itemPosition.z > SceneController.roadSegmentSize) {
-        itemPosition.z -=  this.horizonDotZ();
+        //itemPosition.z -=  this.horizonDotZ();
+        const zSlot = this.itemToSlotZ[itemName];
+        
+        this.freeSlotsZ.push(zSlot);
+        delete this.itemToSlotZ[itemName];
+
+        this.randomizeItemStartPosition(itemName)
       }
     }
   }
@@ -241,7 +269,7 @@ export class InGameState implements State, InputControllerDelegate {
         roadSegmentPosition.z += this.context.gameData.speed;
 
         if (roadSegmentPosition.z > SceneController.roadSegmentSize) {
-          roadSegmentPosition.z -= SceneController.roadSegmentSize * this.roadSegmentsRowsCount;
+          roadSegmentPosition.z += this.horizonDotZ();
         }
 
         this.sceneController.moveObjectTo(

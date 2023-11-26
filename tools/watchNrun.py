@@ -60,7 +60,7 @@ async def send_data(websocket, path):
                 await websocket.send("need_reload")
                 need_reload = False
             except Exception as exception:
-                print(f"Websockets problem: 😔: {exception}")
+                #print(f"Websockets problem: 😔: {exception}")
                 restart()
 
 def restart():
@@ -69,6 +69,7 @@ def restart():
         asyncio.get_event_loop().run_until_complete(start_data_sender)
         asyncio.get_event_loop().run_forever()
     except:
-        print("Screaming eternaly!!!!")
+        pass
+        #print("Screaming eternaly!!!!")
 
 restart()
