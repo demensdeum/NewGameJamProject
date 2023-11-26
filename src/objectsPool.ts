@@ -3,12 +3,26 @@ import { ObjectsPoolItem } from "./objectdsPoolItem.js";
 export class ObjectsPool<T> {
     private items: Array<ObjectsPoolItem<T>> = [];
 
-    public tryPop(): ObjectsPoolItem<T> | null {
+    public tryPop(): T | null {
         const item = this.items.find(n => n.isFree)
-        return item ?? null;
+        if (item) {
+            item.isFree = false;
+        }
+        return item?.value ?? null;
     }
 
-    public push(item: ObjectsPoolItem<T>) {
-        this.items.push(item);
+    public push(value: T) {
+        const maybeItem = this.items.find(n => n.value == value);
+        if (maybeItem != null) {
+            maybeItem.isFree = true;
+        }
+        else {
+            const item = new ObjectsPoolItem(
+                true,
+               value
+            );
+            item.isFree = true;
+            this.items.push(item);
+        }
     }
 }

@@ -5,6 +5,10 @@ export class Utils {
     static randomInt(max) {
         return Math.floor(Math.random() * max);
     }
+    static randomBool() {
+        const randomBool = () => Math.random() < 0.5;
+        return randomBool;
+    }
     static shuffle(array) {
         let currentIndex = array.length, randomIndex;
         while (currentIndex != 0) {

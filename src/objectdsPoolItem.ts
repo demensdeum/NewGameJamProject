@@ -3,9 +3,11 @@ export class ObjectsPoolItem<T> {
     public value: T
 
     constructor(
+        isFree: boolean,
         value: T
     )
     {
+        this.isFree = isFree;
         this.value = value;
     }
 }

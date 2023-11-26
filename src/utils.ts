@@ -6,6 +6,11 @@ export class Utils {
         return Math.floor(Math.random() * max);
     }
 
+    public static randomBool() {
+        const randomBool = (): boolean => Math.random() < 0.5;
+        return randomBool;
+    }
+
     public static shuffle<T>(array: T[]): T[] {
         let currentIndex = array.length, randomIndex;
         while (currentIndex != 0) {

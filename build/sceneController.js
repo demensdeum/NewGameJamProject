@@ -81,12 +81,11 @@ export class SceneController {
         this.rotateObject(Identifiers.skyboxRight, 0, Utils.angleToRadians(90), 0);
         this.moveObjectTo(Identifiers.skyboxRight, SceneController.skyboxPositionDiffX, 0, 0);
     }
-    addBoxAt(name, x, y, z, texturePath, color = 0x00FFFF) {
+    addBoxAt(name, x, y, z, texturePath, size, color = 0x00FFFF) {
         this.context.debugPrint("addCubeAt");
         const texture = this.loadTexture(texturePath);
-        const carSize = SceneController.carSize;
         // @ts-ignore
-        const boxGeometry = new THREE.BoxGeometry(carSize, carSize, carSize);
+        const boxGeometry = new THREE.BoxGeometry(size, size, size);
         // @ts-ignore
         const boxMaterial = new THREE.MeshBasicMaterial({
             color: color,
@@ -124,7 +123,7 @@ export class SceneController {
     }
     addCarAt(name, x, y, z) {
         this.context.debugPrint("addCarAt");
-        this.addBoxAt(name, x, y, z, "./data/carTexture.png");
+        this.addBoxAt(name, x, y, z, "./data/carTexture.png", SceneController.carSize);
     }
     addRoadSegmentAt(name, x, y, z) {
         this.context.debugPrint("addRoadSegmentAt");
@@ -137,14 +136,14 @@ export class SceneController {
         return outputPosition;
     }
     addItemAt(name, x, y, z) {
-        const item = this.addBoxAt(name, x, y, z, "./data/itemTexture.png", 0x00FFFF);
+        const item = this.addBoxAt(name, x, y, z, "./data/itemTexture.png", SceneController.itemSize, 0x00FFFF);
     }
     sceneObject(name) {
         // @ts-ignore
         var object = this.objects.find(obj => obj.name === name);
         if (!object || object == undefined) {
             this.context.debugPrint("Can't find object with name: {" + name + "}!!!!!");
-            this.addBoxAt(name, 0, 0, 0, "./data/failbackTexture.png");
+            this.addBoxAt(name, 0, 0, 0, "./data/failbackTexture.png", SceneController.itemSize);
             return this.sceneObject(name);
         }
         return object;
@@ -162,6 +161,7 @@ export class SceneController {
         sceneObject.threeObject.rotation.z = z;
     }
 }
+SceneController.itemSize = 1;
 SceneController.carSize = 1;
 SceneController.roadSegmentSize = 2;
 SceneController.skyboxPositionDiffX = 0.5;

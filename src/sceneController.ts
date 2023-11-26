@@ -13,6 +13,7 @@ export class SceneController {
 
     private canvas: HTMLCanvasElement;
 
+    public static readonly itemSize: number = 1;
     public static readonly carSize: number = 1;
     public static readonly roadSegmentSize: number = 2;
     public static readonly skyboxPositionDiffX: number = 0.5;
@@ -187,17 +188,17 @@ export class SceneController {
         x: number,
         y: number,
         z: number,
-        texturePath: string,        
+        texturePath: string,    
+        size: number,            
         color: number = 0x00FFFF
     ): void {
         this.context.debugPrint("addCubeAt");
         const texture = this.loadTexture(texturePath);
-        const carSize = SceneController.carSize;
         // @ts-ignore
         const boxGeometry = new THREE.BoxGeometry(
-            carSize, 
-            carSize, 
-            carSize
+            size, 
+            size, 
+            size
         );
         // @ts-ignore
         const boxMaterial = new THREE.MeshBasicMaterial({
@@ -268,7 +269,8 @@ export class SceneController {
             x,
             y,
             z,
-            "./data/carTexture.png"
+            "./data/carTexture.png",
+            SceneController.carSize
         )
     }
 
@@ -318,7 +320,8 @@ export class SceneController {
             y,
             z,
             "./data/itemTexture.png",
-            0x00FFFF
+            SceneController.itemSize,
+            0x00FFFF            
         )
     }
 
@@ -335,7 +338,8 @@ export class SceneController {
                 0, 
                 0, 
                 0,
-                "./data/failbackTexture.png"
+                "./data/failbackTexture.png",
+                SceneController.itemSize
             );
             return this.sceneObject(name);
         }

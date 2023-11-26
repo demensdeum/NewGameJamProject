@@ -1,6 +1,7 @@
 export class ObjectsPoolItem {
-    constructor(value) {
+    constructor(isFree, value) {
         this.isFree = true;
+        this.isFree = isFree;
         this.value = value;
     }
 }
