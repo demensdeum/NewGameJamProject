@@ -26,6 +26,9 @@ export class SceneController {
     private context: Context;
     private objects: [SceneObject];
 
+    private failbackTexture: any;
+    private loadingTexture: any;
+
     constructor(
         context: Context,
         canvas: HTMLCanvasElement
@@ -34,6 +37,14 @@ export class SceneController {
         this.canvas = canvas;
 // @ts-ignore
         this.textureLoader = new THREE.TextureLoader();
+
+        this.failbackTexture = this.textureLoader.load(
+            "./assets/failbackTexture.png"
+        );
+
+        this.loadingTexture = this.textureLoader.load(
+            "./assets/loadingTexture.png"
+        )
 // @ts-ignore
     this.scene = new THREE.Scene();
 // @ts-ignore      
@@ -82,12 +93,21 @@ export class SceneController {
         this.renderer.render(this.scene, this.camera);
     }
 
-    public loadTexture(path: string): any {
-        const texture = this.textureLoader.load(path);
-        if (texture == null || texture == undefined) {
-            this.context.debugPrint("Can't load texture: {path}!!!!!!!");
-        }
-        return this.textureLoader.load("./data/failbackTexture.png")
+    public loadTexture(
+        path: string,
+        successCallback: () => void,
+        errorCallback: () => void
+    ): any {
+        const texture = this.textureLoader.load(
+            path,
+            () => {
+                successCallback();
+            },
+            () => {
+                return this.failbackTexture;
+            }
+        );
+        return this.loadingTexture;
     }
 
     private addSceneObject(object: SceneObject): void {
@@ -127,7 +147,7 @@ export class SceneController {
             -SceneController.skyboxPositionDiffX,
             1,
             1,
-            "data/background.png",
+            "./assets/background.png",
             0x0000FF,
             true
         )
@@ -139,7 +159,7 @@ export class SceneController {
             -SceneController.skyboxPositionDiffX,
             1,
             1,
-            "data/background.png",
+            "./assets/background.png",
             0x00FFFF,
             true
         )
@@ -163,7 +183,7 @@ export class SceneController {
             SceneController.skyboxPositionDiffX,
             1,
             1,
-            "data/background.png",
+            "./assets/background.png",
             0xFF00FF,
             true
         )
@@ -191,7 +211,7 @@ export class SceneController {
         color: number = 0x00FFFF
     ): void {
         this.context.debugPrint("addCubeAt");
-        const texture = this.loadTexture(texturePath);
+        const texture = this.loadTexture(texturePath, ()=>{},()=>{});
         // @ts-ignore
         const boxGeometry = new THREE.BoxGeometry(
             size, 
@@ -231,7 +251,7 @@ export class SceneController {
         // @ts-ignore
         const planeGeometry = new THREE.PlaneGeometry(width, height);
 
-        const texture = this.loadTexture(texturePath);
+        const texture = this.loadTexture(texturePath, ()=>{}, ()=>{});
 
         // @ts-ignore
         const planeMaterial = new THREE.MeshBasicMaterial({
@@ -270,7 +290,7 @@ export class SceneController {
             x,
             y,
             z,
-            "./data/carTexture.png",
+            "./assets/carTexture.png",
             SceneController.carSize
         )
     }
@@ -289,7 +309,7 @@ export class SceneController {
             z,
             SceneController.roadSegmentSize,
             SceneController.roadSegmentSize,
-            "data/roadSegmentTexture.png"
+            "./assets/roadSegmentTexture.png"
         ); 
         this.rotateObject(
             name,
@@ -336,7 +356,7 @@ export class SceneController {
             x,
             y,
             z,
-            "./data/itemTexture.png",
+            "./assets/itemTexture.png",
             SceneController.itemSize,
             0x00FFFF            
         )
@@ -355,7 +375,7 @@ export class SceneController {
                 0, 
                 0, 
                 0,
-                "./data/failbackTexture.png",
+                "./assets/failbackTexture.png",
                 SceneController.itemSize
             );
             return this.sceneObject(name);

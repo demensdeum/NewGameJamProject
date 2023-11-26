@@ -1,14 +1,19 @@
-from http.server import SimpleHTTPRequestHandler, HTTPServer
+# NoCacheHTTPServer.py
 
-class NoCacheRequestHandler(SimpleHTTPRequestHandler):
-    def end_headers(self):
-        # Override the caching headers to set max-age=0
-        self.send_header('Cache-Control', 'max-age=0')
-        super().end_headers()
+import http.server
 
-# Create a simple HTTP server with the custom request handler
-port = 8000
-httpd = HTTPServer(('localhost', port), NoCacheRequestHandler)
+PORT = 8000
 
-print(f"Serving on port {port}")
-httpd.serve_forever()
+class NoCacheHTTPRequestHandler(
+    http.server.SimpleHTTPRequestHandler
+):
+    def send_response_only(self, code, message=None):
+        super().send_response_only(code, message)
+        self.send_header('Cache-Control', 'no-store, must-revalidate')
+        self.send_header('Expires', '0')
+
+if __name__ == '__main__':
+    http.server.test(
+        HandlerClass=NoCacheHTTPRequestHandler,
+        port=PORT
+    )

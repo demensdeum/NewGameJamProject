@@ -10,6 +10,8 @@ export class SceneController {
         this.canvas = canvas;
         // @ts-ignore
         this.textureLoader = new THREE.TextureLoader();
+        this.failbackTexture = this.textureLoader.load("./assets/failbackTexture.png");
+        this.loadingTexture = this.textureLoader.load("./assets/loadingTexture.png");
         // @ts-ignore
         this.scene = new THREE.Scene();
         // @ts-ignore      
@@ -40,12 +42,13 @@ export class SceneController {
     step() {
         this.renderer.render(this.scene, this.camera);
     }
-    loadTexture(path) {
-        const texture = this.textureLoader.load(path);
-        if (texture == null || texture == undefined) {
-            this.context.debugPrint("Can't load texture: {path}!!!!!!!");
-        }
-        return this.textureLoader.load("./data/failbackTexture.png");
+    loadTexture(path, successCallback, errorCallback) {
+        const texture = this.textureLoader.load(path, () => {
+            successCallback();
+        }, () => {
+            return this.failbackTexture;
+        });
+        return this.loadingTexture;
     }
     addSceneObject(object) {
         // @ts-ignore
@@ -72,17 +75,17 @@ export class SceneController {
         }
     }
     addSkybox() {
-        this.addPlaneAt(Names.skyboxFront, 0, 0, -SceneController.skyboxPositionDiffX, 1, 1, "data/background.png", 0x0000FF, true);
-        this.addPlaneAt(Names.skyboxLeft, 0, 0, -SceneController.skyboxPositionDiffX, 1, 1, "data/background.png", 0x00FFFF, true);
+        this.addPlaneAt(Names.skyboxFront, 0, 0, -SceneController.skyboxPositionDiffX, 1, 1, "./assets/background.png", 0x0000FF, true);
+        this.addPlaneAt(Names.skyboxLeft, 0, 0, -SceneController.skyboxPositionDiffX, 1, 1, "./assets/background.png", 0x00FFFF, true);
         this.rotateObject(Names.skyboxLeft, 0, Utils.angleToRadians(90), 0);
         this.moveObjectTo(Names.skyboxLeft, -SceneController.skyboxPositionDiffX, 0, 0);
-        this.addPlaneAt(Names.skyboxRight, 0, 0, SceneController.skyboxPositionDiffX, 1, 1, "data/background.png", 0xFF00FF, true);
+        this.addPlaneAt(Names.skyboxRight, 0, 0, SceneController.skyboxPositionDiffX, 1, 1, "./assets/background.png", 0xFF00FF, true);
         this.rotateObject(Names.skyboxRight, 0, Utils.angleToRadians(90), 0);
         this.moveObjectTo(Names.skyboxRight, SceneController.skyboxPositionDiffX, 0, 0);
     }
     addBoxAt(name, x, y, z, texturePath, size, color = 0x00FFFF) {
         this.context.debugPrint("addCubeAt");
-        const texture = this.loadTexture(texturePath);
+        const texture = this.loadTexture(texturePath, () => { }, () => { });
         // @ts-ignore
         const boxGeometry = new THREE.BoxGeometry(size, size, size);
         // @ts-ignore
@@ -102,7 +105,7 @@ export class SceneController {
         this.context.debugPrint("addPlaneAt");
         // @ts-ignore
         const planeGeometry = new THREE.PlaneGeometry(width, height);
-        const texture = this.loadTexture(texturePath);
+        const texture = this.loadTexture(texturePath, () => { }, () => { });
         // @ts-ignore
         const planeMaterial = new THREE.MeshBasicMaterial({
             // @ts-ignore
@@ -124,11 +127,11 @@ export class SceneController {
     }
     addCarAt(name, x, y, z) {
         this.context.debugPrint("addCarAt");
-        this.addBoxAt(name, x, y, z, "./data/carTexture.png", SceneController.carSize);
+        this.addBoxAt(name, x, y, z, "./assets/carTexture.png", SceneController.carSize);
     }
     addRoadSegmentAt(name, x, y, z) {
         this.context.debugPrint("addRoadSegmentAt");
-        this.addPlaneAt(name, x, y, z, SceneController.roadSegmentSize, SceneController.roadSegmentSize, "data/roadSegmentTexture.png");
+        this.addPlaneAt(name, x, y, z, SceneController.roadSegmentSize, SceneController.roadSegmentSize, "./assets/roadSegmentTexture.png");
         this.rotateObject(name, Utils.angleToRadians(-90), 0, 0);
     }
     sceneObjectPosition(name) {
@@ -148,14 +151,14 @@ export class SceneController {
         return output;
     }
     addItemAt(name, x, y, z) {
-        const item = this.addBoxAt(name, x, y, z, "./data/itemTexture.png", SceneController.itemSize, 0x00FFFF);
+        const item = this.addBoxAt(name, x, y, z, "./assets/itemTexture.png", SceneController.itemSize, 0x00FFFF);
     }
     sceneObject(name) {
         // @ts-ignore
         var object = this.objects.find(obj => obj.name === name);
         if (!object || object == undefined) {
             this.context.debugPrint("Can't find object with name: {" + name + "}!!!!!");
-            this.addBoxAt(name, 0, 0, 0, "./data/failbackTexture.png", SceneController.itemSize);
+            this.addBoxAt(name, 0, 0, 0, "./assets/failbackTexture.png", SceneController.itemSize);
             return this.sceneObject(name);
         }
         return object;
