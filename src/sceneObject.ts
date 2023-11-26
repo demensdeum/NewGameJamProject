@@ -1,6 +1,6 @@
 export class SceneObject {
     public name: string;
-    public threeObject: any;    
+    public threeObject: any; 
 
     constructor(
         name: string,

@@ -1,7 +1,7 @@
 import { Utils } from './utils.js';
 import { SceneController } from './sceneController.js';
 import { GameInputMouseEvent } from './gameInputMouseEvent.js';
-import { Identifiers as Names } from './names.js';
+import { Names } from './names.js';
 import { ObjectsPool } from './objectsPool.js';
 export class InGameState {
     constructor(name, context, sceneController) {
@@ -11,7 +11,8 @@ export class InGameState {
         this.floorY = -2;
         this.birdView = false;
         this.itemRareChance = 20;
-        this.speedLimit = 0.1;
+        this.hidingPlaceZ = SceneController.roadSegmentSize;
+        this.speedLimit = 0.2;
         this.name = name;
         this.objectsPool = new ObjectsPool();
         this.context = context;
@@ -93,8 +94,20 @@ export class InGameState {
     updateUI() {
         this.sceneController.updateUI();
     }
+    hideItem(name) {
+        this.sceneController.moveObjectTo(name, 0, 0, this.hidingPlaceZ);
+    }
     collide() {
-        this.gameData.score += 1;
+        for (var i = 0; i < this.itemsCount; i++) {
+            const itemName = this.itemName(i);
+            if (this.sceneController.objectCollidesWithObject(Names.playerCar, itemName)) {
+                this.gameData.score += 100;
+                this.hideItem(itemName);
+            }
+            else {
+                continue;
+            }
+        }
     }
     step() {
         this.increaseSpeed();
@@ -139,7 +152,7 @@ export class InGameState {
             const maybeRowOccupantItemName = this.itemName(i);
             const maybeRowOccupantItemPosition = this.sceneController.sceneObjectPosition(maybeRowOccupantItemName);
             if (maybeRowOccupantItemPosition.z == this.horizonDotZ()) {
-                this.context.debugPrint("SPAWN ROW OCCUPIED!!! WAIT PLS!!!");
+                //this.context.debugPrint("SPAWN ROW OCCUPIED!!! WAIT PLS!!!");        
                 return;
             }
         }
@@ -151,7 +164,7 @@ export class InGameState {
                 const roadSegmentName = this.roadSegmentName(x, z);
                 const roadSegmentPosition = this.sceneController.sceneObjectPosition(roadSegmentName);
                 roadSegmentPosition.z += this.context.gameData.speed;
-                if (roadSegmentPosition.z > SceneController.roadSegmentSize) {
+                if (roadSegmentPosition.z > this.hidingPlaceZ) {
                     roadSegmentPosition.z += this.horizonDotZ();
                     if (Utils.randomInt(this.itemRareChance) == 0) {
                         this.tryToaddItemAtLastRow();

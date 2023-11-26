@@ -6,7 +6,7 @@ import { InputControllerDelegate } from './inputControllerDelegate';
 import { GameInputEvent } from './gameInputEvent';
 import { InputController } from './inputController';
 import { GameInputMouseEvent } from './gameInputMouseEvent.js';
-import { Identifiers, Identifiers as Names } from './names.js';
+import { Names } from './names.js';
 import { GameData } from './gameData.js';
 import { ObjectsPool } from './objectsPool.js'
 import { SceneObject } from './sceneObject';
@@ -20,9 +20,10 @@ export class InGameState implements State, InputControllerDelegate {
   private readonly itemsCount: number = this.roadSegmentsRowsCount / 4;
   private readonly floorY: number = -2;
   private readonly birdView: boolean = false;
-  private readonly itemRareChance: number = 20;  
+  private readonly itemRareChance: number = 20; 
+  private readonly hidingPlaceZ: number = SceneController.roadSegmentSize; 
 
-  private speedLimit: number = 0.1;
+  private speedLimit: number = 0.2;
   private objectsPool: ObjectsPool<SceneObjectName>;
 
   public name: string;
@@ -177,8 +178,26 @@ export class InGameState implements State, InputControllerDelegate {
     this.sceneController.updateUI();
   }
 
+  private hideItem(name: string) {
+    this.sceneController.moveObjectTo(
+      name,
+      0,
+      0,
+      this.hidingPlaceZ,
+    )
+  }
+
   private collide(): void {
-    this.gameData.score += 1;
+    for (var i = 0; i < this.itemsCount; i++) {
+      const itemName = this.itemName(i);
+      if (this.sceneController.objectCollidesWithObject(Names.playerCar, itemName)) {
+        this.gameData.score += 100;
+        this.hideItem(itemName)
+      }
+      else {
+        continue;
+      }
+    }
   }
 
   public step(): void {
@@ -236,7 +255,7 @@ export class InGameState implements State, InputControllerDelegate {
       const maybeRowOccupantItemName = this.itemName(i);
       const maybeRowOccupantItemPosition = this.sceneController.sceneObjectPosition(maybeRowOccupantItemName);
       if (maybeRowOccupantItemPosition.z == this.horizonDotZ()) {
-        this.context.debugPrint("SPAWN ROW OCCUPIED!!! WAIT PLS!!!");        
+        //this.context.debugPrint("SPAWN ROW OCCUPIED!!! WAIT PLS!!!");        
         return;
       }
     }
@@ -258,7 +277,7 @@ export class InGameState implements State, InputControllerDelegate {
         );
         roadSegmentPosition.z += this.context.gameData.speed;
 
-        if (roadSegmentPosition.z > SceneController.roadSegmentSize) {
+        if (roadSegmentPosition.z > this.hidingPlaceZ) {
           roadSegmentPosition.z += this.horizonDotZ();
           if (Utils.randomInt(this.itemRareChance) == 0) {
             this.tryToaddItemAtLastRow();

@@ -1,4 +1,4 @@
-export enum Identifiers {
+export enum Names {
     camera = "camera",
     playerCar = "playerCar",
     skyboxLeft = "skyboxLeft",

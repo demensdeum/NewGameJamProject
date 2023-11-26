@@ -1,11 +1,11 @@
 import { Context } from "./context.js"
 import { Utils } from './utils.js'
 import { SceneObject } from "./sceneObject.js";
-import { Identifiers } from "./names.js";
 // @ts-ignore
 import * as dat from '/libs/dat.gui.module.js';
 import { GameData } from "./gameData.js";
 import { SceneObjectIdentifier } from "./sceneObjectIdentifier.js";
+import { Names } from "./names.js"
 
 const gui = new dat.GUI();
 
@@ -44,8 +44,11 @@ export class SceneController {
         1000
     );
 
+    // @ts-ignore
+    const colliderBox = new THREE.Box3().setFromObject(this.camera);
+
     const cameraSceneObject = new SceneObject(
-        "camera",
+        Names.camera,
         this.camera
     );
 
@@ -99,12 +102,7 @@ export class SceneController {
         this.objects.push(object);
         this.scene.add(object.threeObject);
     }
-
-    private escapeUnicode(str: string) {
-        return [...str].map(c => /^[\x00-\x7F]$/.test(c) ? c : c.split("").map(a => "\\u" + a.charCodeAt(0).toString(16).padStart(4, "0")).join("")).join("");
-    }
       
-
     public addUI(gameData: GameData): void {
         const scoreView = gui
             .add(gameData, 'score')
@@ -123,7 +121,7 @@ export class SceneController {
 
     public addSkybox(): void {
         this.addPlaneAt(
-            Identifiers.skyboxFront,
+            Names.skyboxFront,
             0,
             0,
             -SceneController.skyboxPositionDiffX,
@@ -135,7 +133,7 @@ export class SceneController {
         )
 
         this.addPlaneAt(
-            Identifiers.skyboxLeft,
+            Names.skyboxLeft,
             0,
             0,
             -SceneController.skyboxPositionDiffX,
@@ -146,20 +144,20 @@ export class SceneController {
             true
         )
         this.rotateObject(
-            Identifiers.skyboxLeft,
+            Names.skyboxLeft,
             0,
             Utils.angleToRadians(90),
             0
         )   
         this.moveObjectTo(
-            Identifiers.skyboxLeft,
+            Names.skyboxLeft,
             -SceneController.skyboxPositionDiffX,
             0,
             0
         )
 
         this.addPlaneAt(
-            Identifiers.skyboxRight,
+            Names.skyboxRight,
             0,
             0,
             SceneController.skyboxPositionDiffX,
@@ -170,13 +168,13 @@ export class SceneController {
             true
         )
         this.rotateObject(
-            Identifiers.skyboxRight,
+            Names.skyboxRight,
             0,
             Utils.angleToRadians(90),
             0
         )   
         this.moveObjectTo(
-            Identifiers.skyboxRight,
+            Names.skyboxRight,
             SceneController.skyboxPositionDiffX,
             0,
             0
@@ -250,6 +248,9 @@ export class SceneController {
         plane.position.y = y;
         plane.position.z = z;
 
+        // @ts-ignore
+        const box = new THREE.Box3().setFromObject(plane);
+
         const sceneObject = new SceneObject(
             name,
             plane
@@ -305,6 +306,22 @@ export class SceneController {
         const outputObject = this.sceneObject(name);
         const outputPosition = outputObject.threeObject.position;
         return outputPosition;
+    }
+
+    public objectCollidesWithObject(
+        alisaName: string,
+        bobName: string
+    ): boolean
+    {
+        const alisa = this.sceneObject(alisaName);
+        const bob = this.sceneObject(bobName);
+        // @ts-ignore
+        const alisaColliderBox = new THREE.Box3().setFromObject(alisa.threeObject);
+        // @ts-ignore
+        const bobCollider = new THREE.Box3().setFromObject(bob.threeObject);
+        const output = alisaColliderBox.intersectsBox(bobCollider);
+        //this.context.debugPrint("alisa object:" + alisa.name + "; bob: "+ bob.name +"; collide result: " + output);
+        return output;
     }
 
     public addItemAt(
