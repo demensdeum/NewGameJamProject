@@ -28,5 +28,7 @@ function main(argv: {[key: string]: string}) {
 }
 
 main(
-    {"debugEnabled": "true"}
+    {
+        "debugEnabled": "true"
+    }
 )

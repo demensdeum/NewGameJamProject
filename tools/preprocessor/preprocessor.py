@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import os
 import sys
 import json
@@ -7,12 +9,12 @@ def load_rules(file_path):
         return json.load(rules_file)
 
 def process_file(input_file, output_file, rules):
-    with open(input_file, 'r') as file:
+    with open(input_file, 'r', encoding='utf-8') as file:
         content = file.read()
         for key, value in rules.items():
             content = content.replace(key, value)
 
-    with open(output_file, 'w') as file:
+    with open(output_file, 'w', encoding='utf-8') as file:
         file.write(content)
 
 def process_files_in_folder(input_folder, output_folder, rules, silent_mode=True):

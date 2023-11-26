@@ -74,9 +74,9 @@ export class InputController {
             const xLimit = this.canvas.width;
             var xAspect = (this.currentTouchX - this.touchStartX) / xLimit;
             xAspect = Math.min(xLimit, xAspect);
-            const yAspect = this.currentTouchY / this.canvas.height;
+            const yAspect = this.currentTouchY / this.canvas.height
             const mouseEvent = new GameInputMouseEvent(new GameVector2D(xAspect, yAspect));
-            this.delegate.inputControllerDidReceive(this, mouseEvent);            
+            this.delegate.inputControllerDidReceive(this, mouseEvent);        
         }
     }
 }

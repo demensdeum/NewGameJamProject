@@ -1,8 +1,6 @@
-var GameInputKeyboardEvent = /** @class */ (function () {
-    function GameInputKeyboardEvent(name, value) {
+export class GameInputKeyboardEvent {
+    constructor(name, value) {
         this.name = name;
         this.value = value;
     }
-    return GameInputKeyboardEvent;
-}());
-export { GameInputKeyboardEvent };
+}

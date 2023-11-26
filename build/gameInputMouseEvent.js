@@ -1,8 +1,6 @@
-var GameInputMouseEvent = /** @class */ (function () {
-    function GameInputMouseEvent(value) {
+export class GameInputMouseEvent {
+    constructor(value) {
         this.name = "mouse";
         this.value = value;
     }
-    return GameInputMouseEvent;
-}());
-export { GameInputMouseEvent };
+}

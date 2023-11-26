@@ -1,8 +1,6 @@
-var GameData = /** @class */ (function () {
-    function GameData() {
+export class GameData {
+    constructor() {
         this.score = 0;
         this.speed = 0;
     }
-    return GameData;
-}());
-export { GameData };
+}

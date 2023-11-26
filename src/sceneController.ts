@@ -99,10 +99,15 @@ export class SceneController {
         this.scene.add(object.threeObject);
     }
 
+    private escapeUnicode(str: string) {
+        return [...str].map(c => /^[\x00-\x7F]$/.test(c) ? c : c.split("").map(a => "\\u" + a.charCodeAt(0).toString(16).padStart(4, "0")).join("")).join("");
+    }
+      
+
     public addUI(gameData: GameData): void {
         const scoreView = gui
             .add(gameData, 'score')
-            .name("Score");
+            .name("\u041E\u0447\u043A\u0438");
         gui.add(gameData, 'speed')
             .name("Speed")
             .step(0.01);

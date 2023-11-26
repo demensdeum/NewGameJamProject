@@ -4,6 +4,7 @@
       "module": "ESNext",
       "strict": true,
       "noImplicitReturns": true,
+      "target": "ES2017",
       "lib": ["es2017", "dom"]
     },
     "include": [

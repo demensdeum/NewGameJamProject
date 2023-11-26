@@ -1,9 +1,9 @@
 import { Context } from './context.js';
 import { InGameState } from './inGameState.js';
 function main(argv) {
-    var debugEnabled = argv["debugEnabled"] === "true";
-    var context = new Context(debugEnabled);
-    var initialState = new InGameState("In Game", context, context.sceneController);
+    const debugEnabled = argv["debugEnabled"] === "true";
+    const context = new Context(debugEnabled);
+    const initialState = new InGameState("In Game", context, context.sceneController);
     context.start(initialState);
     function step() {
         if (!context.isRunning) {
@@ -14,4 +14,6 @@ function main(argv) {
     }
     requestAnimationFrame(step);
 }
-main({ "debugEnabled": "true" });
+main({
+    "debugEnabled": "true"
+});

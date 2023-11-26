@@ -6,6 +6,7 @@ import { InputControllerDelegate } from './inputControllerDelegate.js';
 import { GameInputEvent } from './gameInputEvent.js';
 import { GameInputKeyboardEvent } from './gameInputKeyboardEvent.js';
 import { GameData } from './gameData.js';
+import { LiveUpdateWebSocketClient } from './liveUpdateSocketClient.js';
 
 export class Context implements InputControllerDelegate {
   public isRunning: boolean = false;
@@ -16,12 +17,13 @@ export class Context implements InputControllerDelegate {
   private inputController: InputController;
   private state: State;
   private debugEnabled: boolean;
+  private liveUpdateWebSocketClient = new LiveUpdateWebSocketClient("localhost:8766");
 
   constructor(
     debugEnabled: boolean
   ) {
       this.debugEnabled = debugEnabled; 
-      this.gameData = new GameData();   
+      this.gameData = new GameData();
       this.state = new IdleState(this);
 
       if (!this.canvas || this.canvas == undefined) {
@@ -76,7 +78,7 @@ export class Context implements InputControllerDelegate {
     if (!this.debugEnabled) {
       return;
     }
-    console.log(text)
+    console.log(text);
   }  
 
   public inputControllerDidReceive<T>(

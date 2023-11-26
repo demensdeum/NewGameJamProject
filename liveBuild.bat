@@ -1,7 +1,9 @@
-set PATH=%PATH%;.\node_modules\.bin;"C:\Program Files\Mozilla Firefox\"
-:loop
-cls
-python .\tools\preprocessor\preprocessor.py .\src .\src-preprocessed .\tools\preprocessor\rules.json
-call tsc
-timeout /t 4
-goto loop
+call .\tools\build.bat
+@echo off
+if %errorlevel% neq 0 (
+    @echo on
+    echo BUILD IS BROKEN! Exit code: %errorlevel%
+    @echo off
+    exit /b %errorlevel%
+)
+python tools\watchNrun.py .\src .\tools\build.bat
