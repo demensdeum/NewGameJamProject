@@ -107,9 +107,9 @@ export class SceneController {
     public addUI(gameData: GameData): void {
         const scoreView = gui
             .add(gameData, 'score')
-            .name("\u041E\u0447\u043A\u0438");
+            .name(_t("Score"));
         gui.add(gameData, 'speed')
-            .name("Speed")
+            .name(_t("Speed"))
             .step(0.01);
         scoreView.domElement.style.pointerEvents = "none"
     }

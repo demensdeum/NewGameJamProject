@@ -1,4 +1,4 @@
 {
-    ".half()": "* 0.5"
+    ".half()": " * 0.5",
+    "_t": "this.context.translator.translatedStringForKey"
 }
-  

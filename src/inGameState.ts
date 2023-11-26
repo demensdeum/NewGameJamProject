@@ -20,7 +20,7 @@ export class InGameState implements State, InputControllerDelegate {
   private readonly itemsCount: number = 20;
   private readonly floorY: number = -2;
 
-  private speedLimit: number = 0.4;
+  private speedLimit: number = 0.05;
   private objectsPool: ObjectsPool<SceneObjectName>;
 
   public name: string;

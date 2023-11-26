@@ -10,7 +10,7 @@ export class InGameState {
         this.roadSegmentsRowsCount = 25;
         this.itemsCount = 20;
         this.floorY = -2;
-        this.speedLimit = 0.4;
+        this.speedLimit = 0.05;
         this.name = name;
         this.objectsPool = new ObjectsPool();
         this.context = context;

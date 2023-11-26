@@ -61,9 +61,9 @@ export class SceneController {
     addUI(gameData) {
         const scoreView = gui
             .add(gameData, 'score')
-            .name("\u041E\u0447\u043A\u0438");
+            .name(this.context.translator.translatedStringForKey("Score"));
         gui.add(gameData, 'speed')
-            .name("Speed")
+            .name(this.context.translator.translatedStringForKey("Speed"))
             .step(0.01);
         scoreView.domElement.style.pointerEvents = "none";
     }

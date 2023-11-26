@@ -7,10 +7,12 @@ import { GameInputEvent } from './gameInputEvent.js';
 import { GameInputKeyboardEvent } from './gameInputKeyboardEvent.js';
 import { GameData } from './gameData.js';
 import { LiveUpdateWebSocketClient } from './liveUpdateSocketClient.js';
+import { Translator } from './translator.js';
 
 export class Context implements InputControllerDelegate {
   public isRunning: boolean = false;
   public sceneController: SceneController;
+  public translator: Translator;
   public gameData: GameData;
 
   private readonly canvas?: HTMLCanvasElement | null = document.querySelector("canvas");
@@ -24,6 +26,7 @@ export class Context implements InputControllerDelegate {
   ) {
       this.debugEnabled = debugEnabled; 
       this.gameData = new GameData();
+      this.translator = new Translator("en");
       this.state = new IdleState(this);
 
       if (!this.canvas || this.canvas == undefined) {

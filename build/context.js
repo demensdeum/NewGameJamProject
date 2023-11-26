@@ -3,6 +3,7 @@ import { IdleState } from './idleState.js';
 import { InputController } from './inputController.js';
 import { GameData } from './gameData.js';
 import { LiveUpdateWebSocketClient } from './liveUpdateSocketClient.js';
+import { Translator } from './translator.js';
 export class Context {
     constructor(debugEnabled) {
         this.isRunning = false;
@@ -10,6 +11,7 @@ export class Context {
         this.liveUpdateWebSocketClient = new LiveUpdateWebSocketClient("localhost:8766");
         this.debugEnabled = debugEnabled;
         this.gameData = new GameData();
+        this.translator = new Translator("en");
         this.state = new IdleState(this);
         if (!this.canvas || this.canvas == undefined) {
             this.raiseCriticalError("1Canvas in NULL!!!!");

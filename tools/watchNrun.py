@@ -32,6 +32,7 @@ if __name__ == "__main__":
     bat_file_path = sys.argv[2]
     
     event_handler = FilesChangeHandler()
+    run_bat_file()
     observer = Observer()
     observer.schedule(event_handler, directory_path, recursive=False)
 
@@ -53,16 +54,21 @@ async def handler(websocket, path):
 async def send_data(websocket, path):
     global need_reload
     while True:
-        await asyncio.sleep(2)
+        await asyncio.sleep(3)
         if need_reload:
-            await websocket.send("need_reload")
-            need_reload = False            
-        else:
-            await websocket.send(str(time.time()))  
+            try:
+                await websocket.send("need_reload")
+                need_reload = False
+            except Exception as exception:
+                print(f"Websockets problem: 😔: {exception}")
+                restart()
 
-start_server = websockets.serve(handler, "localhost", 8765)
-start_data_sender = websockets.serve(send_data, "localhost", 8766)
+def restart():
+    try:
+        start_data_sender = websockets.serve(send_data, "localhost", 8766)
+        asyncio.get_event_loop().run_until_complete(start_data_sender)
+        asyncio.get_event_loop().run_forever()
+    except:
+        print("Screaming eternaly!!!!")
 
-asyncio.get_event_loop().run_until_complete(start_server)
-asyncio.get_event_loop().run_until_complete(start_data_sender)
-asyncio.get_event_loop().run_forever()
+restart()
