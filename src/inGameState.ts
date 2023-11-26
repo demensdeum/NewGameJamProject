@@ -15,11 +15,12 @@ import { SceneObjectIdentifier, SceneObjectIdentifier as SceneObjectName } from 
 
 export class InGameState implements State, InputControllerDelegate {
   
-  private readonly roadSegmentsColumnsCount: number = 4;
-  private readonly roadSegmentsRowsCount: number = 10;
-  private readonly itemsCount: number = this.roadSegmentsRowsCount * 2;
+  private readonly roadSegmentsColumnsCount: number = 3;
+  private readonly roadSegmentsRowsCount: number = 27;
+  private readonly itemsCount: number = this.roadSegmentsRowsCount / 4;
   private readonly floorY: number = -2;
   private readonly birdView: boolean = false;
+  private readonly itemRareChance: number = 20;  
 
   private speedLimit: number = 0.1;
   private objectsPool: ObjectsPool<SceneObjectName>;
@@ -147,8 +148,8 @@ export class InGameState implements State, InputControllerDelegate {
     this.sceneController.moveObjectTo(
       Names.camera, 
       0, 
-      this.birdView ? 12 : 0, 
-      this.birdView ? -10 : 0 
+      this.birdView ? 18 : 0, 
+      this.birdView ? -8 : 0 
     );
     this.sceneController.rotateObject(
       Names.camera,
@@ -209,7 +210,7 @@ export class InGameState implements State, InputControllerDelegate {
       const itemPosition = this.sceneController.sceneObjectPosition(itemName);
       itemPosition.z += this.gameData.speed;
 
-      if (itemPosition.z > -SceneController.roadSegmentSize) {
+      if (itemPosition.z > SceneController.roadSegmentSize) {
         this.objectsPool.push(itemName);
       }
     }
@@ -259,7 +260,7 @@ export class InGameState implements State, InputControllerDelegate {
 
         if (roadSegmentPosition.z > SceneController.roadSegmentSize) {
           roadSegmentPosition.z += this.horizonDotZ();
-          if (Utils.randomBool()) {
+          if (Utils.randomInt(this.itemRareChance) == 0) {
             this.tryToaddItemAtLastRow();
           }
         }
