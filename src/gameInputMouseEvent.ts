@@ -1,10 +1,11 @@
 import { GameInputEvent } from "./gameInputEvent"
+import { GameVector2D } from "./gameVector2D";
 
-export class GameInputMouseEvent implements GameInputEvent<[number, number]> {
+export class GameInputMouseEvent implements GameInputEvent<GameVector2D> {
     public name: string = "mouse";
-    public value: [number, number];
+    public value: GameVector2D;
 
-    constructor(value: [number, number]) {
+    constructor(value: GameVector2D) {
         this.value = value;
     }
 }

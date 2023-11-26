@@ -6,7 +6,7 @@ import { InputControllerDelegate } from './inputControllerDelegate';
 import { GameInputEvent } from './gameInputEvent';
 import { InputController } from './inputController';
 import { GameInputMouseEvent } from './gameInputMouseEvent.js';
-import { Identifiers } from './identifiers.js';
+import { Identifiers as Names } from './names.js';
 import { GameData } from './gameData.js';
 import { ObjectsPool } from './objectsPool.js'
 import { SceneObject } from './sceneObject';
@@ -78,9 +78,9 @@ export class InGameState implements State, InputControllerDelegate {
     inputEvent: GameInputEvent<T>): void {
       if (inputEvent instanceof GameInputMouseEvent) {
         const value = inputEvent.value;
-        const inputX = value[0];
+        const inputX = value.x;
         const xDiff = inputX;
-        const position = this.sceneController.sceneObjectPosition(Identifiers.playerCar);
+        const position = this.sceneController.sceneObjectPosition(Names.playerCar);
         var newX = position.x + xDiff;
         const carLeftPointX = (position.x + xDiff) - SceneController.carSize.half();
         const carRightPointX = (position.x + xDiff) + SceneController.carSize.half();
@@ -94,11 +94,11 @@ export class InGameState implements State, InputControllerDelegate {
         }
         const leftSkyBoxX = newX - SceneController.skyboxPositionDiffX;
         const rightSkyBoxX = newX + SceneController.skyboxPositionDiffX;
-        this.changeObjectX(Identifiers.playerCar, newX);
-        this.changeObjectX(Identifiers.camera, newX);
-        this.changeObjectX(Identifiers.skyboxLeft, leftSkyBoxX);
-        this.changeObjectX(Identifiers.skyboxFront, newX);
-        this.changeObjectX(Identifiers.skyboxRight, rightSkyBoxX);
+        this.changeObjectX(Names.playerCar, newX);
+        this.changeObjectX(Names.camera, newX);
+        this.changeObjectX(Names.skyboxLeft, leftSkyBoxX);
+        this.changeObjectX(Names.skyboxFront, newX);
+        this.changeObjectX(Names.skyboxRight, rightSkyBoxX);
       }
   }
 
@@ -124,7 +124,7 @@ export class InGameState implements State, InputControllerDelegate {
     this.sceneController.addSkybox();
 
     this.sceneController.addCarAt(
-      Identifiers.playerCar,
+      Names.playerCar,
       0, 
       this.floorY + SceneController.carSize.half(), 
       -4

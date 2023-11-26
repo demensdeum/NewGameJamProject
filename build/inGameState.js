@@ -1,7 +1,7 @@
 import { Utils } from './utils.js';
 import { SceneController } from './sceneController.js';
 import { GameInputMouseEvent } from './gameInputMouseEvent.js';
-import { Identifiers } from './identifiers.js';
+import { Identifiers as Names } from './names.js';
 import { ObjectsPool } from './objectsPool.js';
 import { ObjectsPoolItem } from './objectdsPoolItem.js';
 var InGameState = /** @class */ (function () {
@@ -38,9 +38,9 @@ var InGameState = /** @class */ (function () {
     InGameState.prototype.inputControllerDidReceive = function (inputController, inputEvent) {
         if (inputEvent instanceof GameInputMouseEvent) {
             var value = inputEvent.value;
-            var inputX = value[0];
+            var inputX = value.x;
             var xDiff = inputX;
-            var position = this.sceneController.sceneObjectPosition(Identifiers.playerCar);
+            var position = this.sceneController.sceneObjectPosition(Names.playerCar);
             var newX = position.x + xDiff;
             var carLeftPointX = (position.x + xDiff) - SceneController.carSize * 0.5;
             var carRightPointX = (position.x + xDiff) + SceneController.carSize * 0.5;
@@ -54,11 +54,11 @@ var InGameState = /** @class */ (function () {
             }
             var leftSkyBoxX = newX - SceneController.skyboxPositionDiffX;
             var rightSkyBoxX = newX + SceneController.skyboxPositionDiffX;
-            this.changeObjectX(Identifiers.playerCar, newX);
-            this.changeObjectX(Identifiers.camera, newX);
-            this.changeObjectX(Identifiers.skyboxLeft, leftSkyBoxX);
-            this.changeObjectX(Identifiers.skyboxFront, newX);
-            this.changeObjectX(Identifiers.skyboxRight, rightSkyBoxX);
+            this.changeObjectX(Names.playerCar, newX);
+            this.changeObjectX(Names.camera, newX);
+            this.changeObjectX(Names.skyboxLeft, leftSkyBoxX);
+            this.changeObjectX(Names.skyboxFront, newX);
+            this.changeObjectX(Names.skyboxRight, rightSkyBoxX);
         }
     };
     InGameState.prototype.changeObjectX = function (name, x) {
@@ -70,7 +70,7 @@ var InGameState = /** @class */ (function () {
         this.context = context;
         this.sceneController = context.sceneController;
         this.sceneController.addSkybox();
-        this.sceneController.addCarAt(Identifiers.playerCar, 0, this.floorY + SceneController.carSize * 0.5, -4);
+        this.sceneController.addCarAt(Names.playerCar, 0, this.floorY + SceneController.carSize * 0.5, -4);
         for (var x = 0; x < this.roadSegmentsColumnsCount; x++) {
             for (var z = 0; z < this.roadSegmentsRowsCount; z++) {
                 var name_1 = this.roadSegmentName(x, z);

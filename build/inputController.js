@@ -1,4 +1,5 @@
 import { GameInputMouseEvent } from "./gameInputMouseEvent.js";
+import { GameVector2D } from "./gameVector2D.js";
 var InputController = /** @class */ (function () {
     function InputController(context, canvas, delegate) {
         this.isTouching = false;
@@ -53,7 +54,7 @@ var InputController = /** @class */ (function () {
             var xAspect = (this.currentTouchX - this.touchStartX) / xLimit;
             xAspect = Math.min(xLimit, xAspect);
             var yAspect = this.currentTouchY / this.canvas.height;
-            var mouseEvent = new GameInputMouseEvent([xAspect, yAspect]);
+            var mouseEvent = new GameInputMouseEvent(new GameVector2D(xAspect, yAspect));
             this.delegate.inputControllerDidReceive(this, mouseEvent);
         }
     };

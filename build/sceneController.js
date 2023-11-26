@@ -1,6 +1,6 @@
 import { Utils } from './utils.js';
 import { SceneObject } from "./sceneObject.js";
-import { Identifiers } from "./identifiers.js";
+import { Identifiers } from "./names.js";
 // @ts-ignore
 import * as dat from '/libs/dat.gui.module.js';
 var gui = new dat.GUI();

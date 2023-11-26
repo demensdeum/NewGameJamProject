@@ -15,22 +15,27 @@ def process_file(input_file, output_file, rules):
     with open(output_file, 'w') as file:
         file.write(content)
 
-def process_files_in_folder(input_folder, output_folder, rules):
+def process_files_in_folder(input_folder, output_folder, rules, silent_mode=True):
     for filename in os.listdir(input_folder):
         if filename.endswith(".ts"):
             input_file = os.path.join(input_folder, filename)
             output_file = os.path.join(output_folder, filename)
             process_file(input_file, output_file, rules)
-            print(f"File {filename} processed and saved in {output_folder}.")
+            if not silent_mode:
+                print(f"File {filename} processed and saved in {output_folder}.")
 
 if __name__ == "__main__":
-    if len(sys.argv) != 4:
-        print("Usage: python script.py /path/to/input/folder /path/to/output/folder /path/to/rules.json")
+    if len(sys.argv) < 4:
+        print("Usage: python script.py /path/to/input/folder /path/to/output/folder /path/to/rules.json [silent_mode]")
         sys.exit(1)
 
     input_folder = sys.argv[1]
     output_folder = sys.argv[2]
     rules_file_path = sys.argv[3]
+
+    silent_mode = True
+    if len(sys.argv) == 5:
+        silent_mode = sys.argv[4].lower() == 'true'
 
     if not os.path.exists(input_folder):
         print(f"The specified folder {input_folder} does not exist.")
@@ -45,4 +50,5 @@ if __name__ == "__main__":
 
     rules = load_rules(rules_file_path)
 
-    process_files_in_folder(input_folder, output_folder, rules)
+    # Add silent_mode argument and set it to True by default
+    process_files_in_folder(input_folder, output_folder, rules, silent_mode)
