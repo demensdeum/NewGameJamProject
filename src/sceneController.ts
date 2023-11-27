@@ -30,6 +30,9 @@ export class SceneController {
     // @ts-ignore
     private textureLoader: any = new THREE.TextureLoader();
 
+    private clock = new THREE.Clock();
+    private animationMixers: any[] = []; 
+
     private context: Context;
     private objects: [SceneObject];
 
@@ -218,8 +221,14 @@ export class SceneController {
         )        
     }
 
+    public addLight() {
+        const light = new THREE.HemisphereLight( 0x0000ff, 0x00ff00, 0.6 ); 
+        this.scene.add(light);  
+    }
+
     public addModelAt(
         name: string,
+        modelPath: string,
         x: number,
         y: number,
         z: number,   
@@ -259,7 +268,7 @@ export class SceneController {
         const scene = this.scene;
         const loader = new GLTFLoader();
         loader.load(
-          "./assets/playerCarModel.glb",
+          modelPath,
           // @ts-ignore
           function (container) {
             const model = container.scene;
@@ -267,9 +276,26 @@ export class SceneController {
             model.position.y = y;
             model.position.z = z;
             box.attach(model);
+
+            if (container.animations.length > 0) {
+                const animationMixer = new THREE.AnimationMixer(model);
+                const clips = container.animations;
+                const clip = THREE.AnimationClip.findByName(clips, "Open");
+                if (clip) {
+                    console.log("clip");
+                }
+                const action = animationMixer.clipAction(clip);
+                action.play();     
+                sceneController.animationMixers.push(animationMixer)
+            }
           }
         );
 
+    }
+
+    public animationsStep() {
+        const delta = this.clock.getDelta();
+        this.animationMixers.forEach((n) => n.update(delta));
     }
 
     private replaceObject(object: any) {
@@ -418,6 +444,7 @@ export class SceneController {
 
         this.addModelAt(
             name,
+            "./assets/playerCarModel.glb",
             x,
             y,
             z,
@@ -481,14 +508,13 @@ export class SceneController {
         z: number
     ): void
     {
-        this.addBoxAt(
+        this.addModelAt(
             name,
+            "./assets/rhythmCube.glb",
             x,
             y,
             z,
-            "./assets/itemTexture.png",
-            SceneController.itemSize,
-            0x00FFFF            
+            SceneController.itemSize
         )
     }
 

@@ -81,7 +81,7 @@ export class InGameState {
                 this.sceneController.addRoadSegmentAt(name, roadSegmentX, this.floorY, roadSegmentZ);
             }
         }
-        this.sceneController.moveObjectTo(Names.camera, 0, this.birdView ? 18 : 0, this.birdView ? -8 : 0);
+        this.sceneController.moveObjectTo(Names.camera, 0, this.birdView ? 8 : 0, this.birdView ? -4 : 0);
         this.sceneController.rotateObject(Names.camera, this.birdView ? Utils.angleToRadians(-80) : 0, 0, 0);
         this.sceneController.addUI(context.gameData);
         for (var i = 0; i < this.itemsCount; i++) {
@@ -89,6 +89,7 @@ export class InGameState {
             this.sceneController.addItemAt(name, 0, this.floorY + SceneController.itemSize * 0.5, 0);
             this.objectsPool.push(name);
         }
+        this.sceneController.addLight();
         context.debugPrint("In Game State Initialized");
     }
     updateUI() {
@@ -111,6 +112,7 @@ export class InGameState {
         }
     }
     step() {
+        this.sceneController.animationsStep();
         this.increaseSpeed();
         this.moveRoad();
         this.moveItems();

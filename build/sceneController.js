@@ -13,6 +13,8 @@ export class SceneController {
         this.texturesToLoad = [];
         // @ts-ignore
         this.textureLoader = new THREE.TextureLoader();
+        this.clock = new THREE.Clock();
+        this.animationMixers = [];
         this.context = context;
         this.canvas = canvas;
         // @ts-ignore
@@ -101,7 +103,11 @@ export class SceneController {
         this.rotateObject(Names.skyboxRight, 0, Utils.angleToRadians(270), 0);
         this.moveObjectTo(Names.skyboxRight, SceneController.skyboxPositionDiffX, 0, 0);
     }
-    addModelAt(name, x, y, z, boxSize, color = 0x00FFFF) {
+    addLight() {
+        const light = new THREE.HemisphereLight(0x0000ff, 0x00ff00, 0.6);
+        this.scene.add(light);
+    }
+    addModelAt(name, modelPath, x, y, z, boxSize, color = 0x00FFFF) {
         this.context.debugPrint("addCubeAt");
         // @ts-ignore
         const boxGeometry = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
@@ -122,7 +128,7 @@ export class SceneController {
         sceneController.addSceneObject(sceneObject);
         const scene = this.scene;
         const loader = new GLTFLoader();
-        loader.load("./assets/playerCarModel.glb", 
+        loader.load(modelPath, 
         // @ts-ignore
         function (container) {
             const model = container.scene;
@@ -130,7 +136,22 @@ export class SceneController {
             model.position.y = y;
             model.position.z = z;
             box.attach(model);
+            if (container.animations.length > 0) {
+                const animationMixer = new THREE.AnimationMixer(model);
+                const clips = container.animations;
+                const clip = THREE.AnimationClip.findByName(clips, "Open");
+                if (clip) {
+                    console.log("clip");
+                }
+                const action = animationMixer.clipAction(clip);
+                action.play();
+                sceneController.animationMixers.push(animationMixer);
+            }
         });
+    }
+    animationsStep() {
+        const delta = this.clock.getDelta();
+        this.animationMixers.forEach((n) => n.update(delta));
     }
     replaceObject(object) {
         this.context.debugPrint("replace object");
@@ -227,7 +248,7 @@ export class SceneController {
         //     SceneController.itemSize,
         //     0x00FFFF            
         // )
-        this.addModelAt(name, x, y, z, SceneController.carSize);
+        this.addModelAt(name, "./assets/playerCarModel.glb", x, y, z, SceneController.carSize);
     }
     addRoadSegmentAt(name, x, y, z) {
         this.context.debugPrint("addRoadSegmentAt");
@@ -251,7 +272,7 @@ export class SceneController {
         return output;
     }
     addItemAt(name, x, y, z) {
-        this.addBoxAt(name, x, y, z, "./assets/itemTexture.png", SceneController.itemSize, 0x00FFFF);
+        this.addModelAt(name, "./assets/rhythmCube.glb", x, y, z, SceneController.itemSize);
     }
     sceneObject(name) {
         // @ts-ignore

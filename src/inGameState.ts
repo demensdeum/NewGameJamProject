@@ -149,8 +149,8 @@ export class InGameState implements State, InputControllerDelegate {
     this.sceneController.moveObjectTo(
       Names.camera, 
       0, 
-      this.birdView ? 18 : 0, 
-      this.birdView ? -8 : 0 
+      this.birdView ? 8 : 0, 
+      this.birdView ? -4 : 0 
     );
     this.sceneController.rotateObject(
       Names.camera,
@@ -170,6 +170,8 @@ export class InGameState implements State, InputControllerDelegate {
       );
       this.objectsPool.push(name);
     }
+
+    this.sceneController.addLight();
 
     context.debugPrint("In Game State Initialized");
   }
@@ -202,6 +204,7 @@ export class InGameState implements State, InputControllerDelegate {
   }
 
   public step(): void {
+    this.sceneController.animationsStep();
     this.increaseSpeed();
     this.moveRoad();
     this.moveItems();
