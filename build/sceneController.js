@@ -80,9 +80,13 @@ export class SceneController {
         const scoreView = gui
             .add(gameData, 'score')
             .name(this.context.translator.translatedStringForKey("Score"));
-        gui.add(gameData, 'speed')
+        gui.add(gameData, 'speedOutput')
             .name(this.context.translator.translatedStringForKey("Speed"))
             .step(0.01);
+        gui.add(gameData, 'time')
+            .name(this.context.translator.translatedStringForKey("Time"));
+        gui.add(gameData, 'message')
+            .name(this.context.translator.translatedStringForKey("Message"));
         scoreView.domElement.style.pointerEvents = "none";
     }
     updateUI() {

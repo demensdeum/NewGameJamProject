@@ -141,9 +141,13 @@ export class SceneController {
         const scoreView = gui
             .add(gameData, 'score')
             .name(_t("Score"));
-        gui.add(gameData, 'speed')
+        gui.add(gameData, 'speedOutput')
             .name(_t("Speed"))
             .step(0.01);
+        gui.add(gameData, 'time')
+            .name(_t("Time"));               
+        gui.add(gameData, 'message')
+            .name(_t("Message"));                      
         scoreView.domElement.style.pointerEvents = "none"
     }
 

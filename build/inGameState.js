@@ -12,7 +12,7 @@ export class InGameState {
         this.birdView = false;
         this.itemRareChance = 20;
         this.hidingPlaceZ = SceneController.roadSegmentSize;
-        this.speedLimit = 0.2;
+        this.speedLimitMax = 0.2;
         this.isRunning = false;
         this.name = name;
         this.objectsPool = new ObjectsPool();
@@ -97,8 +97,13 @@ export class InGameState {
         }
         this.sceneController.addLight();
         context.debugPrint("In Game State Initialized");
+        alert("Добро пожаловать в AudioStorm: Melodic Wave!");
     }
     start() {
+        this.gameData.endDate = new Date(new Date().getTime() + 120000);
+        this.gameData.speedLimit = 0.1;
+        this.gameData.speed = 0;
+        this.gameData.message = this.context.translator.translatedStringForKey("Game Started!");
         this.isRunning = true;
     }
     updateUI() {
@@ -114,14 +119,34 @@ export class InGameState {
                 this.gameData.score += 100;
                 this.hideItem(itemName);
                 this.context.soundPlayer.play("./assets/beep.ogg");
+                this.gameData.message = this.context.translator.translatedStringForKey("Music cube!");
+                const speedUpCratesCount = 4;
+                const speedUpScoreStep = speedUpCratesCount * 100;
+                if (this.gameData.score % speedUpScoreStep == 0) {
+                    this.gameData.speedLimit = Math.min(this.gameData.speedLimit + 0.005, this.speedLimitMax);
+                    this.context.soundPlayer.play("./assets/boost.ogg");
+                    this.gameData.message = this.context.translator.translatedStringForKey("Speed boost!");
+                }
             }
             else {
                 continue;
             }
         }
     }
+    gameEnd() {
+        alert("Игра завершилась! Вы набрали: " + this.gameData.score + " очков!");
+        location.reload();
+    }
     step() {
         if (this.isRunning) {
+            // @ts-ignore
+            const timeDiff = this.gameData.endDate.getTime() - new Date().getTime();
+            if (timeDiff < 1) {
+                this.start();
+                this.gameEnd();
+            }
+            const diffSeconds = Math.floor((timeDiff / 1000));
+            this.gameData.time = diffSeconds;
             this.sceneController.animationsStep();
             this.increaseSpeed();
             this.moveRoad();
@@ -131,8 +156,9 @@ export class InGameState {
         }
     }
     increaseSpeed() {
-        if (this.gameData.speed < this.speedLimit) {
+        if (this.gameData.speed < this.gameData.speedLimit) {
             this.gameData.speed += 0.001;
+            this.gameData.speedOutput += 1;
         }
     }
     itemName(i) {

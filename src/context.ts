@@ -21,14 +21,14 @@ export class Context implements InputControllerDelegate {
   private state: State;
   private debugEnabled: boolean;
   private liveUpdateWebSocketClient = new LiveUpdateWebSocketClient("localhost:8766");
-  public soundPlayer: SoundPlayer = new SoundPlayer(0.01);
+  public soundPlayer: SoundPlayer = new SoundPlayer(0.7);
 
   constructor(
     debugEnabled: boolean
   ) {
       this.debugEnabled = debugEnabled; 
       this.gameData = new GameData();
-      this.translator = new Translator("en");
+      this.translator = new Translator("ru");
       this.state = new IdleState(this);
 
       if (!this.canvas || this.canvas == undefined) {
@@ -37,6 +37,7 @@ export class Context implements InputControllerDelegate {
       const canvas = this.canvas!;
 
       this.soundPlayer.add("./assets/beep.ogg");
+      this.soundPlayer.add("./assets/boost.ogg");
 
       this.inputController = new InputController(
         this,

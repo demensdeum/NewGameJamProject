@@ -10,16 +10,17 @@ export class Context {
         this.isRunning = false;
         this.canvas = document.querySelector("canvas");
         this.liveUpdateWebSocketClient = new LiveUpdateWebSocketClient("localhost:8766");
-        this.soundPlayer = new SoundPlayer(0.01);
+        this.soundPlayer = new SoundPlayer(0.7);
         this.debugEnabled = debugEnabled;
         this.gameData = new GameData();
-        this.translator = new Translator("en");
+        this.translator = new Translator("ru");
         this.state = new IdleState(this);
         if (!this.canvas || this.canvas == undefined) {
             this.raiseCriticalError("1Canvas in NULL!!!!");
         }
         const canvas = this.canvas;
         this.soundPlayer.add("./assets/beep.ogg");
+        this.soundPlayer.add("./assets/boost.ogg");
         this.inputController = new InputController(this, canvas, this);
         this.sceneController = new SceneController(this, canvas);
         this.debugPrint("Game Context Initialized...");

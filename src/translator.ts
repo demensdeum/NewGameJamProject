@@ -5,11 +5,21 @@ export class Translator {
     private readonly dictionary: { [key: string]: { [key: string]: string } } = {
         "en" : {
             "Score" : "Score",
-            "Speed" : "Speed"
+            "Speed" : "Speed",
+            "Message" : "Message",
+            "Music cube!" : "Music cube!",
+            "Speed boost!" : "Speed boost!",
+            "Time" : "Time",
+            "Game Started!" : "Game Started!"
         },
         "ru" : {
             "Score" : "Очки",
-            "Speed" : "Скорость"
+            "Speed" : "Скорость",
+            "Message" : "Сообщение",
+            "Music cube!" : "Музыкальный куб!",
+            "Speed boost!" : "Ускорение!",
+            "Time" : "Время",
+            "Game Started!" : "Игра началась!"
         }
     };
 
