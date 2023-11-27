@@ -13,6 +13,7 @@ export class InGameState {
         this.itemRareChance = 20;
         this.hidingPlaceZ = SceneController.roadSegmentSize;
         this.speedLimit = 0.2;
+        this.isRunning = false;
         this.name = name;
         this.objectsPool = new ObjectsPool();
         this.context = context;
@@ -72,7 +73,10 @@ export class InGameState {
         this.context = context;
         this.sceneController = context.sceneController;
         this.sceneController.addSkybox();
-        this.sceneController.addPlayerCarAt(Names.playerCar, 0, this.floorY + SceneController.carSize * 0.5, -4);
+        const state = this;
+        this.sceneController.addPlayerCarAt(Names.playerCar, 0, this.floorY + SceneController.carSize * 0.5, -4, () => {
+            state.start();
+        });
         for (let x = 0; x < this.roadSegmentsColumnsCount; x++) {
             for (let z = 0; z < this.roadSegmentsRowsCount; z++) {
                 const name = this.roadSegmentName(x, z);
@@ -86,11 +90,16 @@ export class InGameState {
         this.sceneController.addUI(context.gameData);
         for (var i = 0; i < this.itemsCount; i++) {
             const name = this.itemName(i);
-            this.sceneController.addItemAt(name, 0, this.floorY + SceneController.itemSize * 0.5, 0);
+            this.sceneController.addItemAt(name, 0, this.floorY + SceneController.itemSize * 0.5, 0, () => {
+                context.debugPrint("item loaded");
+            });
             this.objectsPool.push(name);
         }
         this.sceneController.addLight();
         context.debugPrint("In Game State Initialized");
+    }
+    start() {
+        this.isRunning = true;
     }
     updateUI() {
         this.sceneController.updateUI();
@@ -112,12 +121,14 @@ export class InGameState {
         }
     }
     step() {
-        this.sceneController.animationsStep();
-        this.increaseSpeed();
-        this.moveRoad();
-        this.moveItems();
-        this.collide();
-        this.updateUI();
+        if (this.isRunning) {
+            this.sceneController.animationsStep();
+            this.increaseSpeed();
+            this.moveRoad();
+            this.moveItems();
+            this.collide();
+            this.updateUI();
+        }
     }
     increaseSpeed() {
         if (this.gameData.speed < this.speedLimit) {

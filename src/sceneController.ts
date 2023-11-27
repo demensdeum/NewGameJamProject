@@ -49,9 +49,7 @@ export class SceneController {
 // @ts-ignore
         this.failbackTexture = this.textureLoader.load(
             "./assets/failbackTexture.png",
-            ()=>{
-                console.log("UHHHHHHHHH");
-            }
+            ()=>{}
         );
 
         this.loadingTexture = this.textureLoader.load(
@@ -127,11 +125,6 @@ export class SceneController {
     }
 
     private addSceneObject(object: SceneObject): void {
-
-        if (object.name == Names.playerCar) {
-            // debugger;
-        }
-
         // @ts-ignore
         const alreadyAddedObject = this.objects.find(obj => obj.name === object.name);
 
@@ -233,7 +226,8 @@ export class SceneController {
         x: number,
         y: number,
         z: number,   
-        boxSize: number,            
+        boxSize: number,
+        successCallback: (()=>void),     
         color: number = 0x00FFFF
     ): void {
         this.context.debugPrint("addCubeAt");
@@ -286,6 +280,8 @@ export class SceneController {
                 
             });
             sceneController.animationMixers.push(animationMixer)
+
+            successCallback();
           }
         );
 
@@ -365,7 +361,9 @@ export class SceneController {
         height: number,
         texturePath: string,
         color: number = 0xFFFFFF,
-        resetDepthBuffer: boolean = false
+        resetDepthBuffer: boolean = false,
+        transparent: boolean = false,
+        opacity: number = 1.0
     ): void {
         this.context.debugPrint("addPlaneAt");
         // @ts-ignore
@@ -379,6 +377,7 @@ export class SceneController {
             depthWrite: !resetDepthBuffer,
             // @ts-ignore
             side: THREE.DoubleSide,
+            transparent: transparent
         });
 
         // @ts-ignore
@@ -399,6 +398,7 @@ export class SceneController {
             depthWrite: !resetDepthBuffer,
             // @ts-ignore
             side: THREE.DoubleSide,
+            transparent: transparent
         });
         this.texturesToLoad.push(newMaterial);        
 
@@ -427,26 +427,18 @@ export class SceneController {
         name: string,
         x: number,
         y: number,
-        z: number
+        z: number,
+        successCallback: (()=>void)
     ): void {
         this.context.debugPrint("addCarAt");      
-        // this.addBoxAt(
-        //     name,
-        //     x,
-        //     y,
-        //     z,
-        //     "./assets/itemTexture.png",
-        //     SceneController.itemSize,
-        //     0x00FFFF            
-        // )
-
         this.addModelAt(
             name,
             "./assets/playerCarModel.glb",
             x,
             y,
             z,
-            SceneController.carSize
+            SceneController.carSize,
+            successCallback
         )
     }
 
@@ -503,7 +495,8 @@ export class SceneController {
         name: SceneObjectIdentifier,
         x: number,
         y: number,
-        z: number
+        z: number,
+        successCallback: (()=>void)
     ): void
     {
         this.addModelAt(
@@ -512,7 +505,8 @@ export class SceneController {
             x,
             y,
             z,
-            SceneController.itemSize
+            SceneController.itemSize,
+            successCallback
         )
     }
 

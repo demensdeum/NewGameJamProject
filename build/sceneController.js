@@ -19,9 +19,7 @@ export class SceneController {
         this.context = context;
         this.canvas = canvas;
         // @ts-ignore
-        this.failbackTexture = this.textureLoader.load("./assets/failbackTexture.png", () => {
-            console.log("UHHHHHHHHH");
-        });
+        this.failbackTexture = this.textureLoader.load("./assets/failbackTexture.png", () => { });
         this.loadingTexture = this.textureLoader.load("./assets/loadingTexture.png");
         // @ts-ignore
         this.scene = new THREE.Scene();
@@ -69,9 +67,6 @@ export class SceneController {
         });
     }
     addSceneObject(object) {
-        if (object.name == Names.playerCar) {
-            // debugger;
-        }
         // @ts-ignore
         const alreadyAddedObject = this.objects.find(obj => obj.name === object.name);
         if (alreadyAddedObject) {
@@ -108,7 +103,7 @@ export class SceneController {
         const light = new THREE.AmbientLight(0xFFFFFF);
         this.scene.add(light);
     }
-    addModelAt(name, modelPath, x, y, z, boxSize, color = 0x00FFFF) {
+    addModelAt(name, modelPath, x, y, z, boxSize, successCallback, color = 0x00FFFF) {
         this.context.debugPrint("addCubeAt");
         // @ts-ignore
         const boxGeometry = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
@@ -143,6 +138,7 @@ export class SceneController {
                 animationMixer.clipAction(clip).play();
             });
             sceneController.animationMixers.push(animationMixer);
+            successCallback();
         });
     }
     animationsStep() {
@@ -187,7 +183,7 @@ export class SceneController {
         const sceneObject = new SceneObject(name, box);
         this.addSceneObject(sceneObject);
     }
-    addPlaneAt(name, x, y, z, width, height, texturePath, color = 0xFFFFFF, resetDepthBuffer = false) {
+    addPlaneAt(name, x, y, z, width, height, texturePath, color = 0xFFFFFF, resetDepthBuffer = false, transparent = false, opacity = 1.0) {
         this.context.debugPrint("addPlaneAt");
         // @ts-ignore
         const planeGeometry = new THREE.PlaneGeometry(width, height);
@@ -199,6 +195,7 @@ export class SceneController {
             depthWrite: !resetDepthBuffer,
             // @ts-ignore
             side: THREE.DoubleSide,
+            transparent: transparent
         });
         // @ts-ignore
         const newMaterial = new THREE.MeshBasicMaterial({
@@ -217,6 +214,7 @@ export class SceneController {
             depthWrite: !resetDepthBuffer,
             // @ts-ignore
             side: THREE.DoubleSide,
+            transparent: transparent
         });
         this.texturesToLoad.push(newMaterial);
         // @ts-ignore
@@ -233,18 +231,9 @@ export class SceneController {
         const sceneObject = new SceneObject(name, plane);
         this.addSceneObject(sceneObject);
     }
-    addPlayerCarAt(name, x, y, z) {
+    addPlayerCarAt(name, x, y, z, successCallback) {
         this.context.debugPrint("addCarAt");
-        // this.addBoxAt(
-        //     name,
-        //     x,
-        //     y,
-        //     z,
-        //     "./assets/itemTexture.png",
-        //     SceneController.itemSize,
-        //     0x00FFFF            
-        // )
-        this.addModelAt(name, "./assets/playerCarModel.glb", x, y, z, SceneController.carSize);
+        this.addModelAt(name, "./assets/playerCarModel.glb", x, y, z, SceneController.carSize, successCallback);
     }
     addRoadSegmentAt(name, x, y, z) {
         this.context.debugPrint("addRoadSegmentAt");
@@ -267,8 +256,8 @@ export class SceneController {
         //this.context.debugPrint("alisa object:" + alisa.name + "; bob: "+ bob.name +"; collide result: " + output);
         return output;
     }
-    addItemAt(name, x, y, z) {
-        this.addModelAt(name, "./assets/rhythmCube.glb", x, y, z, SceneController.itemSize);
+    addItemAt(name, x, y, z, successCallback) {
+        this.addModelAt(name, "./assets/rhythmCube.glb", x, y, z, SceneController.itemSize, successCallback);
     }
     sceneObject(name) {
         // @ts-ignore

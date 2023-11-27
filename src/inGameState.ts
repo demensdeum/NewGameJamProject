@@ -27,6 +27,7 @@ export class InGameState implements State, InputControllerDelegate {
   private objectsPool: ObjectsPool<SceneObjectName>;
 
   public name: string;
+  public isRunning: boolean = false;
 
   private sceneController: SceneController;
   private context: Context;
@@ -126,11 +127,16 @@ export class InGameState implements State, InputControllerDelegate {
 
     this.sceneController.addSkybox();
 
+    const state = this;
+
     this.sceneController.addPlayerCarAt(
       Names.playerCar,
       0, 
       this.floorY + SceneController.carSize.half(), 
-      -4
+      -4,
+      () => {
+        state.start();
+      }
     );
 
     for (let x = 0; x < this.roadSegmentsColumnsCount; x++) {
@@ -166,7 +172,10 @@ export class InGameState implements State, InputControllerDelegate {
         name,
         0,
         this.floorY + SceneController.itemSize.half(),
-        0
+        0,
+        () => {
+          context.debugPrint("item loaded");
+        }
       );
       this.objectsPool.push(name);
     }
@@ -174,6 +183,10 @@ export class InGameState implements State, InputControllerDelegate {
     this.sceneController.addLight();
 
     context.debugPrint("In Game State Initialized");
+  }
+
+  private start(): void {
+    this.isRunning = true;
   }
 
   private updateUI(): void {
@@ -204,12 +217,14 @@ export class InGameState implements State, InputControllerDelegate {
   }
 
   public step(): void {
-    this.sceneController.animationsStep();
-    this.increaseSpeed();
-    this.moveRoad();
-    this.moveItems();
-    this.collide();
-    this.updateUI(); 
+    if (this.isRunning) { 
+      this.sceneController.animationsStep();
+      this.increaseSpeed();
+      this.moveRoad();
+      this.moveItems();
+      this.collide();
+      this.updateUI();
+    }
   }
 
   private increaseSpeed() {
