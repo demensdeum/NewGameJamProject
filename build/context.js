@@ -10,7 +10,7 @@ export class Context {
         this.isRunning = false;
         this.canvas = document.querySelector("canvas");
         this.liveUpdateWebSocketClient = new LiveUpdateWebSocketClient("localhost:8766");
-        this.soundPlayer = new SoundPlayer();
+        this.soundPlayer = new SoundPlayer(0.01);
         this.debugEnabled = debugEnabled;
         this.gameData = new GameData();
         this.translator = new Translator("en");

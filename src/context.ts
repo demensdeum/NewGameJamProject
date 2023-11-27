@@ -21,7 +21,7 @@ export class Context implements InputControllerDelegate {
   private state: State;
   private debugEnabled: boolean;
   private liveUpdateWebSocketClient = new LiveUpdateWebSocketClient("localhost:8766");
-  public soundPlayer: SoundPlayer = new SoundPlayer();
+  public soundPlayer: SoundPlayer = new SoundPlayer(0.01);
 
   constructor(
     debugEnabled: boolean

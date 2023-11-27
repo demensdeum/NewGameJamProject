@@ -1,5 +1,7 @@
-// @ts-expect-error
+// @ts-ignore
 import * as THREE from 'three';
+// @ts-ignore
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { Utils } from './utils.js';
 import { SceneObject } from "./sceneObject.js";
 // @ts-ignore
@@ -64,6 +66,9 @@ export class SceneController {
         });
     }
     addSceneObject(object) {
+        if (object.name == Names.playerCar) {
+            // debugger;
+        }
         // @ts-ignore
         const alreadyAddedObject = this.objects.find(obj => obj.name === object.name);
         if (alreadyAddedObject) {
@@ -96,6 +101,40 @@ export class SceneController {
         this.rotateObject(Names.skyboxRight, 0, Utils.angleToRadians(270), 0);
         this.moveObjectTo(Names.skyboxRight, SceneController.skyboxPositionDiffX, 0, 0);
     }
+    addModelAt(name, x, y, z, boxSize, color = 0x00FFFF) {
+        this.context.debugPrint("addCubeAt");
+        // @ts-ignore
+        const boxGeometry = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
+        // @ts-ignore
+        const material = new THREE.MeshBasicMaterial({
+            color: color,
+            map: this.loadingTexture,
+            transparent: true,
+            opacity: 0.5
+        });
+        // @ts-ignore
+        const box = new THREE.Mesh(boxGeometry, material);
+        box.position.x = x;
+        box.position.y = y;
+        box.position.z = z;
+        const sceneController = this;
+        const sceneObject = new SceneObject(name, box);
+        sceneController.addSceneObject(sceneObject);
+        const scene = this.scene;
+        const loader = new GLTFLoader();
+        loader.load("./assets/playerCarModel.glb", 
+        // @ts-ignore
+        function (container) {
+            const model = container.scene;
+            model.position.x = x;
+            model.position.y = y;
+            model.position.z = z;
+            box.attach(model);
+        });
+    }
+    replaceObject(object) {
+        this.context.debugPrint("replace object");
+    }
     addBoxAt(name, x, y, z, texturePath, size, color = 0x00FFFF) {
         this.context.debugPrint("addCubeAt");
         // @ts-ignore
@@ -103,7 +142,9 @@ export class SceneController {
         // @ts-ignore
         const material = new THREE.MeshBasicMaterial({
             color: color,
-            map: this.loadingTexture
+            map: this.loadingTexture,
+            transparent: true,
+            opacity: 0.5
         });
         const newMaterial = new THREE.MeshBasicMaterial({
             color: color,
@@ -116,7 +157,9 @@ export class SceneController {
             // @ts-ignore
             (error) => {
                 console.log("WUT!!!!");
-            })
+            }),
+            transparent: true,
+            opacity: 0.5
         });
         this.texturesToLoad.push(newMaterial);
         // @ts-ignore
@@ -173,9 +216,18 @@ export class SceneController {
         const sceneObject = new SceneObject(name, plane);
         this.addSceneObject(sceneObject);
     }
-    addCarAt(name, x, y, z) {
+    addPlayerCarAt(name, x, y, z) {
         this.context.debugPrint("addCarAt");
-        this.addBoxAt(name, x, y, z, "./assets/carTexture.png", SceneController.carSize);
+        // this.addBoxAt(
+        //     name,
+        //     x,
+        //     y,
+        //     z,
+        //     "./assets/itemTexture.png",
+        //     SceneController.itemSize,
+        //     0x00FFFF            
+        // )
+        this.addModelAt(name, x, y, z, SceneController.carSize);
     }
     addRoadSegmentAt(name, x, y, z) {
         this.context.debugPrint("addRoadSegmentAt");
@@ -199,14 +251,14 @@ export class SceneController {
         return output;
     }
     addItemAt(name, x, y, z) {
-        const item = this.addBoxAt(name, x, y, z, "./assets/itemTexture.png", SceneController.itemSize, 0x00FFFF);
+        this.addBoxAt(name, x, y, z, "./assets/itemTexture.png", SceneController.itemSize, 0x00FFFF);
     }
     sceneObject(name) {
         // @ts-ignore
         var object = this.objects.find(obj => obj.name === name);
         if (!object || object == undefined) {
             this.context.debugPrint("Can't find object with name: {" + name + "}!!!!!");
-            this.addBoxAt(name, 0, 0, 0, "./assets/failbackTexture.png", SceneController.itemSize);
+            this.addBoxAt(name, 0, 0, 0, "./assets/failbackTexture.png", 1);
             return this.sceneObject(name);
         }
         return object;

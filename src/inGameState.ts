@@ -126,7 +126,7 @@ export class InGameState implements State, InputControllerDelegate {
 
     this.sceneController.addSkybox();
 
-    this.sceneController.addCarAt(
+    this.sceneController.addPlayerCarAt(
       Names.playerCar,
       0, 
       this.floorY + SceneController.carSize.half(), 

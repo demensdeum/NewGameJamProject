@@ -1,5 +1,7 @@
-// @ts-expect-error
+// @ts-ignore
 import * as THREE from 'three';
+// @ts-ignore
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { Context } from "./context.js"
 import { Utils } from './utils.js'
 import { SceneObject } from "./sceneObject.js";
@@ -121,6 +123,11 @@ export class SceneController {
     }
 
     private addSceneObject(object: SceneObject): void {
+
+        if (object.name == Names.playerCar) {
+            // debugger;
+        }
+
         // @ts-ignore
         const alreadyAddedObject = this.objects.find(obj => obj.name === object.name);
 
@@ -211,6 +218,64 @@ export class SceneController {
         )        
     }
 
+    public addModelAt(
+        name: string,
+        x: number,
+        y: number,
+        z: number,   
+        boxSize: number,            
+        color: number = 0x00FFFF
+    ): void {
+        this.context.debugPrint("addCubeAt");
+
+        // @ts-ignore
+        const boxGeometry = new THREE.BoxGeometry(
+            boxSize, 
+            boxSize, 
+            boxSize
+        );
+        // @ts-ignore
+        const material = new THREE.MeshBasicMaterial({
+             color: color,
+             map: this.loadingTexture,
+             transparent: true,             
+             opacity: 0.5
+        });     
+
+        // @ts-ignore
+        const box = new THREE.Mesh(boxGeometry, material);
+        box.position.x = x;
+        box.position.y = y;
+        box.position.z = z;
+
+        const sceneController = this;
+
+        const sceneObject = new SceneObject(
+            name,
+            box
+        );
+        sceneController.addSceneObject(sceneObject);
+
+        const scene = this.scene;
+        const loader = new GLTFLoader();
+        loader.load(
+          "./assets/playerCarModel.glb",
+          // @ts-ignore
+          function (container) {
+            const model = container.scene;
+            model.position.x = x;
+            model.position.y = y;
+            model.position.z = z;
+            box.attach(model);
+          }
+        );
+
+    }
+
+    private replaceObject(object: any) {
+        this.context.debugPrint("replace object");
+    }
+
     public addBoxAt(
         name: string,
         x: number,
@@ -230,7 +295,9 @@ export class SceneController {
         // @ts-ignore
         const material = new THREE.MeshBasicMaterial({
              color: color,
-             map: this.loadingTexture
+             map: this.loadingTexture,
+             transparent: true,             
+             opacity: 0.5
         });
 
         const newMaterial = new THREE.MeshBasicMaterial({
@@ -246,17 +313,17 @@ export class SceneController {
                 (error)=>{
                     console.log("WUT!!!!");
                 }
-            )
+            ),
+            transparent: true,
+            opacity: 0.5
        });        
-       this.texturesToLoad.push(newMaterial);
+       this.texturesToLoad.push(newMaterial);        
 
         // @ts-ignore
         const box = new THREE.Mesh(boxGeometry, material);
         box.position.x = x;
         box.position.y = y;
         box.position.z = z;
-
-             
 
         const sceneObject = new SceneObject(
             name,
@@ -332,19 +399,28 @@ export class SceneController {
         this.addSceneObject(sceneObject);
     }    
 
-    public addCarAt(
+    public addPlayerCarAt(
         name: string,
         x: number,
         y: number,
         z: number
     ): void {
-        this.context.debugPrint("addCarAt");
-        this.addBoxAt(
+        this.context.debugPrint("addCarAt");      
+        // this.addBoxAt(
+        //     name,
+        //     x,
+        //     y,
+        //     z,
+        //     "./assets/itemTexture.png",
+        //     SceneController.itemSize,
+        //     0x00FFFF            
+        // )
+
+        this.addModelAt(
             name,
             x,
             y,
             z,
-            "./assets/carTexture.png",
             SceneController.carSize
         )
     }
@@ -405,7 +481,7 @@ export class SceneController {
         z: number
     ): void
     {
-        const item = this.addBoxAt(
+        this.addBoxAt(
             name,
             x,
             y,
@@ -430,7 +506,7 @@ export class SceneController {
                 0, 
                 0,
                 "./assets/failbackTexture.png",
-                SceneController.itemSize
+                1
             );
             return this.sceneObject(name);
         }

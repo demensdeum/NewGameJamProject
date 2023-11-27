@@ -72,7 +72,7 @@ export class InGameState {
         this.context = context;
         this.sceneController = context.sceneController;
         this.sceneController.addSkybox();
-        this.sceneController.addCarAt(Names.playerCar, 0, this.floorY + SceneController.carSize * 0.5, -4);
+        this.sceneController.addPlayerCarAt(Names.playerCar, 0, this.floorY + SceneController.carSize * 0.5, -4);
         for (let x = 0; x < this.roadSegmentsColumnsCount; x++) {
             for (let z = 0; z < this.roadSegmentsRowsCount; z++) {
                 const name = this.roadSegmentName(x, z);
