@@ -5,7 +5,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { Utils } from './utils.js';
 import { SceneObject } from "./sceneObject.js";
 // @ts-ignore
-import * as dat from '/libs/dat.gui.module.js';
+import * as dat from '../libs/dat.gui.module.js';
 import { Names } from "./names.js";
 const gui = new dat.GUI();
 export class SceneController {
