@@ -222,7 +222,7 @@ export class SceneController {
     }
 
     public addLight() {
-        const light = new THREE.HemisphereLight( 0x0000ff, 0x00ff00, 0.6 ); 
+        const light = new THREE.AmbientLight( 0xFFFFFF );
         this.scene.add(light);  
     }
 
@@ -277,17 +277,13 @@ export class SceneController {
             model.position.z = z;
             box.attach(model);
 
-            if (container.animations.length > 0) {
-                const animationMixer = new THREE.AnimationMixer(model);
-                const clips = container.animations;
-                const clip = THREE.AnimationClip.findByName(clips, "Open");
-                if (clip) {
-                    console.log("clip");
-                }
-                const action = animationMixer.clipAction(clip);
-                action.play();     
-                sceneController.animationMixers.push(animationMixer)
-            }
+            const animationMixer = new THREE.AnimationMixer(model);
+            container.animations.forEach( ( clip ) => {
+        
+                animationMixer.clipAction( clip ).play();
+                
+            });
+            sceneController.animationMixers.push(animationMixer)
           }
         );
 
