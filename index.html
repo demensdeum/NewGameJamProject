@@ -17,8 +17,14 @@
   </head>
   <body>
     <canvas class="webgl"></canvas>
-    <script src="./libs/three.js"></script>
-    <script src="./libs/cannon.js"></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.158/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.158/examples/jsm/"
+        }
+      }
+    </script>
     <script type="module" src="./build/main.js"></script>
   </body>
 </html>

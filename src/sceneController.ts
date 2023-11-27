@@ -1,3 +1,5 @@
+// @ts-expect-error
+import * as THREE from 'three';
 import { Context } from "./context.js"
 import { Utils } from './utils.js'
 import { SceneObject } from "./sceneObject.js";
@@ -235,10 +237,12 @@ export class SceneController {
             color: color,
             map: this.textureLoader.load(
                 texturePath,
+                // @ts-ignore
                 (texture)=>{
                     material.map = texture;
                     material.needsUpdate;
                 },
+                // @ts-ignore
                 (error)=>{
                     console.log("WUT!!!!");
                 }

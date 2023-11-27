@@ -1,3 +1,5 @@
+// @ts-expect-error
+import * as THREE from 'three';
 import { Utils } from './utils.js';
 import { SceneObject } from "./sceneObject.js";
 // @ts-ignore
@@ -105,10 +107,14 @@ export class SceneController {
         });
         const newMaterial = new THREE.MeshBasicMaterial({
             color: color,
-            map: this.textureLoader.load(texturePath, (texture) => {
+            map: this.textureLoader.load(texturePath, 
+            // @ts-ignore
+            (texture) => {
                 material.map = texture;
                 material.needsUpdate;
-            }, (error) => {
+            }, 
+            // @ts-ignore
+            (error) => {
                 console.log("WUT!!!!");
             })
         });
