@@ -40,13 +40,24 @@ export class InputController {
         this.currentTouchY = event.y;
     }
     onTouchStart(event) {
-        this.context.debugPrint("onTouchStart");
+        if (event.touches.length > 0) {
+            this.isTouching = true;
+            this.touchStartX = event.touches[0].pageX;
+            this.touchStartY = event.touches[0].pageY;
+        }
     }
     onTouchEnd(event) {
-        this.context.debugPrint("onTouchEnd");
+        if (event.touches.length > 0) {
+            this.isTouching = false;
+            this.touchStartX = 0;
+            this.touchStartY = 0;
+        }
     }
     onTouchMove(event) {
-        this.context.debugPrint("onTouchMove");
+        if (event.touches.length > 0) {
+            this.currentTouchX = event.touches[0].pageX;
+            this.currentTouchX = event.touches[0].pageY;
+        }
     }
     step() {
         if (this.isTouching) {
