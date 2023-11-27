@@ -91,7 +91,7 @@ export class SceneController {
         this.rotateObject(Names.skyboxLeft, 0, Utils.angleToRadians(90), 0);
         this.moveObjectTo(Names.skyboxLeft, -SceneController.skyboxPositionDiffX, 0, 0);
         this.addPlaneAt(Names.skyboxRight, 0, 0, SceneController.skyboxPositionDiffX, 1, 1, "./assets/skyboxRightTexture.png", 0xFFFFFF, true);
-        this.rotateObject(Names.skyboxRight, 0, Utils.angleToRadians(90), 0);
+        this.rotateObject(Names.skyboxRight, 0, Utils.angleToRadians(270), 0);
         this.moveObjectTo(Names.skyboxRight, SceneController.skyboxPositionDiffX, 0, 0);
     }
     addBoxAt(name, x, y, z, texturePath, size, color = 0x00FFFF) {

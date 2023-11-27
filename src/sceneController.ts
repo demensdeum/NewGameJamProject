@@ -198,7 +198,7 @@ export class SceneController {
         this.rotateObject(
             Names.skyboxRight,
             0,
-            Utils.angleToRadians(90),
+            Utils.angleToRadians(270),
             0
         )   
         this.moveObjectTo(
