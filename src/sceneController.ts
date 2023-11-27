@@ -15,6 +15,7 @@ const gui = new dat.GUI();
 
 export class SceneController {
 
+    private readonly collisions_debug: boolean = false;
     private canvas: HTMLCanvasElement;
 
     public static readonly itemSize: number = 1;
@@ -248,7 +249,7 @@ export class SceneController {
              color: color,
              map: this.loadingTexture,
              transparent: true,             
-             opacity: 0.5
+             opacity: this.collisions_debug ? 0.5 : 0
         });     
 
         // @ts-ignore
@@ -278,6 +279,7 @@ export class SceneController {
             box.attach(model);
 
             const animationMixer = new THREE.AnimationMixer(model);
+            // @ts-ignore
             container.animations.forEach( ( clip ) => {
         
                 animationMixer.clipAction( clip ).play();

@@ -10,6 +10,7 @@ import { Names } from "./names.js";
 const gui = new dat.GUI();
 export class SceneController {
     constructor(context, canvas) {
+        this.collisions_debug = false;
         this.texturesToLoad = [];
         // @ts-ignore
         this.textureLoader = new THREE.TextureLoader();
@@ -116,7 +117,7 @@ export class SceneController {
             color: color,
             map: this.loadingTexture,
             transparent: true,
-            opacity: 0.5
+            opacity: this.collisions_debug ? 0.5 : 0
         });
         // @ts-ignore
         const box = new THREE.Mesh(boxGeometry, material);
@@ -137,6 +138,7 @@ export class SceneController {
             model.position.z = z;
             box.attach(model);
             const animationMixer = new THREE.AnimationMixer(model);
+            // @ts-ignore
             container.animations.forEach((clip) => {
                 animationMixer.clipAction(clip).play();
             });

@@ -15,4 +15,9 @@ Skybox
 https://opengameart.org/content/space-skyboxes-0
 Space Skyboxes
 StumpyStrust
-https://opengameart.org/content/space-skyboxes-0
+
+Lowpoly - Spaceship
+3D Model
+Avatar of danielpaulse
+danielpaulse
+https://sketchfab.com/3d-models/lowpoly-spaceship-0b28e7be4b9149b7827a89521b4239ad
