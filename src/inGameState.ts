@@ -15,20 +15,23 @@ import { SceneObjectIdentifier, SceneObjectIdentifier as SceneObjectName } from 
 
 export class InGameState implements State, InputControllerDelegate {
   
-  private readonly roadSegmentsColumnsCount: number = 3;
   private readonly roadSegmentsRowsCount: number = 27;
   private readonly itemsCount: number = this.roadSegmentsRowsCount / 4;
   private readonly floorY: number = -2;
   private readonly birdView: boolean = false;
   private readonly itemRareChance: number = 20; 
   private readonly hidingPlaceZ: number = SceneController.roadSegmentSize; 
+  private readonly allPreloadedItemsCount: number = this.itemsCount;
 
   private readonly speedLimitMax: number = 0.2;
   private objectsPool: ObjectsPool<SceneObjectName>;
 
+  private roadSegmentsColumnsCount: number = 3;
+
   public name: string;
   public isRunning: boolean = false;
 
+  private loadedItemsCount: number = 0;
   private sceneController: SceneController;
   private context: Context;
   private gameData: GameData;
@@ -119,15 +122,24 @@ export class InGameState implements State, InputControllerDelegate {
     )
   }
 
+  private startGameIfNeeded()
+  {
+    if (this.loadedItemsCount >= this.allPreloadedItemsCount) {
+      this.start();
+    }
+  }
+
   public initialize(
     context: Context
   ): void {
+    this.roadSegmentsColumnsCount = confirm("Добро пожаловать в AudioStorm: Melodic Wave! Начнём на сложном?") ? 4 : 3;
+
     this.context = context;
     this.sceneController = context.sceneController;
 
     this.sceneController.addSkybox();
 
-    const state = this;
+    const ingameState = this;
 
     this.sceneController.addPlayerCarAt(
       Names.playerCar,
@@ -135,7 +147,7 @@ export class InGameState implements State, InputControllerDelegate {
       this.floorY + SceneController.carSize.half(), 
       -4,
       () => {
-        state.start();
+        ingameState.startGameIfNeeded();
       }
     );
 
@@ -166,6 +178,8 @@ export class InGameState implements State, InputControllerDelegate {
     )
     this.sceneController.addUI(context.gameData);
 
+    const inGameState = this;
+
     for (var i = 0; i < this.itemsCount; i++) {
       const name = this.itemName(i);
       this.sceneController.addItemAt(
@@ -174,7 +188,8 @@ export class InGameState implements State, InputControllerDelegate {
         this.floorY + SceneController.itemSize.half(),
         0,
         () => {
-          context.debugPrint("item loaded");
+          inGameState.loadedItemsCount += 1;
+          inGameState.startGameIfNeeded();
         }
       );
       this.objectsPool.push(name);
@@ -183,12 +198,10 @@ export class InGameState implements State, InputControllerDelegate {
     this.sceneController.addLight();
 
     context.debugPrint("In Game State Initialized");
-
-    alert("Добро пожаловать в AudioStorm: Melodic Wave!");
   }
 
   private start(): void {
-    this.gameData.endDate = new Date(new Date().getTime() + 120000);
+    this.gameData.endDate = new Date(new Date().getTime() + 190000);
     this.gameData.speedLimit = 0.1;
     this.gameData.speed = 0;  
     this.gameData.message = _t("Game Started!");
@@ -241,10 +254,9 @@ export class InGameState implements State, InputControllerDelegate {
       // @ts-ignore
       const timeDiff = this.gameData.endDate.getTime() - new Date().getTime();
       if (timeDiff < 1) {
-        this.start();
         this.gameEnd();
       }
-      const diffSeconds = Math.floor((timeDiff / 1000);
+      const diffSeconds = Math.floor(timeDiff / 1000);
       this.gameData.time = diffSeconds;
       this.sceneController.animationsStep();
       this.increaseSpeed();

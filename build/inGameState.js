@@ -5,15 +5,17 @@ import { Names } from './names.js';
 import { ObjectsPool } from './objectsPool.js';
 export class InGameState {
     constructor(name, context, sceneController) {
-        this.roadSegmentsColumnsCount = 3;
         this.roadSegmentsRowsCount = 27;
         this.itemsCount = this.roadSegmentsRowsCount / 4;
         this.floorY = -2;
         this.birdView = false;
         this.itemRareChance = 20;
         this.hidingPlaceZ = SceneController.roadSegmentSize;
+        this.allPreloadedItemsCount = this.itemsCount;
         this.speedLimitMax = 0.2;
+        this.roadSegmentsColumnsCount = 3;
         this.isRunning = false;
+        this.loadedItemsCount = 0;
         this.name = name;
         this.objectsPool = new ObjectsPool();
         this.context = context;
@@ -69,13 +71,19 @@ export class InGameState {
         position.x = x;
         this.sceneController.moveObjectTo(name, position.x, position.y, position.z);
     }
+    startGameIfNeeded() {
+        if (this.loadedItemsCount >= this.allPreloadedItemsCount) {
+            this.start();
+        }
+    }
     initialize(context) {
+        this.roadSegmentsColumnsCount = confirm("Добро пожаловать в AudioStorm: Melodic Wave! Начнём на сложном?") ? 4 : 3;
         this.context = context;
         this.sceneController = context.sceneController;
         this.sceneController.addSkybox();
-        const state = this;
+        const ingameState = this;
         this.sceneController.addPlayerCarAt(Names.playerCar, 0, this.floorY + SceneController.carSize * 0.5, -4, () => {
-            state.start();
+            ingameState.startGameIfNeeded();
         });
         for (let x = 0; x < this.roadSegmentsColumnsCount; x++) {
             for (let z = 0; z < this.roadSegmentsRowsCount; z++) {
@@ -88,16 +96,17 @@ export class InGameState {
         this.sceneController.moveObjectTo(Names.camera, 0, this.birdView ? 8 : 0, this.birdView ? -4 : 0);
         this.sceneController.rotateObject(Names.camera, this.birdView ? Utils.angleToRadians(-80) : 0, 0, 0);
         this.sceneController.addUI(context.gameData);
+        const inGameState = this;
         for (var i = 0; i < this.itemsCount; i++) {
             const name = this.itemName(i);
             this.sceneController.addItemAt(name, 0, this.floorY + SceneController.itemSize * 0.5, 0, () => {
-                context.debugPrint("item loaded");
+                inGameState.loadedItemsCount += 1;
+                inGameState.startGameIfNeeded();
             });
             this.objectsPool.push(name);
         }
         this.sceneController.addLight();
         context.debugPrint("In Game State Initialized");
-        alert("Добро пожаловать в AudioStorm: Melodic Wave!");
     }
     start() {
         this.gameData.endDate = new Date(new Date().getTime() + 120000);
@@ -142,10 +151,9 @@ export class InGameState {
             // @ts-ignore
             const timeDiff = this.gameData.endDate.getTime() - new Date().getTime();
             if (timeDiff < 1) {
-                this.start();
                 this.gameEnd();
             }
-            const diffSeconds = Math.floor((timeDiff / 1000));
+            const diffSeconds = Math.floor(timeDiff / 1000);
             this.gameData.time = diffSeconds;
             this.sceneController.animationsStep();
             this.increaseSpeed();
